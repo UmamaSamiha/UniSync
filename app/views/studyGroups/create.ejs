@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Create Study Group | UniSync</title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>Create a Study Group</h1>
+        
+        <% if (error) { %>
+            <p class="error"><%= error %></p>
+        <% } %>
+
+        <form action="/study-groups" method="POST">
+            <div class="form-group">
+                <label for="name">Group Name *</label>
+                <input type="text" id="name" name="name" placeholder="e.g. Data Structures Study Squad" required />
+            </div>
+
+            <div class="form-group">
+                <label for="subject">Subject *</label>
+                <input type="text" id="subject" name="subject" placeholder="e.g. Computer Science" required />
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4"
+                placeholder="What will this group focus on?"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="created_by">Your Name *</label>
+                <input type="text" id="created_by" name="created_by" placeholder="e.g. Kim Namjoon" required />
+            </div>
+            
+            <button type="submit" class="btn">Create Group</button>
+            <a href="/study-groups" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Study Groups | UniSync</title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="header-row">
+            <h1>Study Groups</h1>
+            <a href="/study-groups/create" class="btn">+ Create Group</a>
+        </div>
+
+        <% if (groups.length === 0) { %>
+            <p class="empty">No study groups yet. Be the first to create one!</p>
+        <% } else { %>
+            <div class="card-grid">
+                <% groups.forEach(group => { %>
+                    <div class="card">
+                        <h2><%= group.name %></h2>
+                        <span class="badge"><%= group.subject %></span>
+                        <p><%= group.description || 'No description provided.' %></p>
+                        <small>Created by <strong><%= group.created_by %></strong></small>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>
