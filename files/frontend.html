@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniSync - Study Tasks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================
+           UniSync - Soothing Blue-Green Theme
+           ============================================ */
+        :root {
+            --teal-50:  #effcf9;
+            --teal-100: #d0f7ef;
+            --teal-200: #a3efe0;
+            --teal-300: #6de0cc;
+            --teal-400: #3fc9b4;
+            --teal-500: #22ab99;
+            --teal-600: #178a7e;
+            --teal-700: #166f67;
+            --teal-800: #165953;
+            --teal-900: #164a46;
+
+            --blue-50:  #f0f7ff;
+            --blue-100: #ddedfb;
+            --blue-200: #c2dff8;
+            --blue-300: #96cbf3;
+            --blue-400: #64adeb;
+            --blue-500: #3f8fe3;
+
+            --slate-50:  #f6f9fa;
+            --slate-100: #edf1f3;
+            --slate-200: #dde4e8;
+            --slate-300: #c2cdd4;
+            --slate-400: #94a5b0;
+            --slate-500: #73858f;
+            --slate-600: #5e6f78;
+            --slate-700: #4d5b63;
+            --slate-800: #3a464d;
+            --slate-900: #1e2a30;
+
+            --bg-body:    #f2faf8;
+            --bg-card:    #ffffff;
+            --text-primary:   var(--slate-900);
+            --text-secondary: var(--slate-500);
+            --border:         var(--teal-200);
+            --shadow-sm:  0 1px 3px rgba(22, 74, 70, 0.06);
+            --shadow-md:  0 4px 16px rgba(22, 74, 70, 0.08);
+            --shadow-lg:  0 8px 30px rgba(22, 74, 70, 0.10);
+            --radius:     14px;
+            --radius-sm:  10px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Floating background blobs */
+        .bg-shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.35;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bg-shape-1 { width: 420px; height: 420px; background: var(--teal-200); top: -120px; right: -100px; }
+        .bg-shape-2 { width: 340px; height: 340px; background: var(--blue-200); bottom: 60px; left: -80px; }
+        .bg-shape-3 { width: 260px; height: 260px; background: var(--teal-100); top: 45%; left: 55%; }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 48px 20px 80px;
+        }
+
+        /* Header */
+        .header { text-align: center; margin-bottom: 36px; }
+        .logo { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 6px; }
+        .logo-icon { color: var(--teal-500); display: flex; }
+        .logo h1 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--teal-600), var(--blue-500));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle { font-size: 0.95rem; color: var(--text-secondary); font-weight: 400; letter-spacing: 0.3px; }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex; align-items: center; justify-content: center; gap: 28px;
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 20px 32px; margin-bottom: 36px; box-shadow: var(--shadow-sm);
+        }
+        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .stat-number { font-family: 'Outfit', sans-serif; font-size: 1.65rem; font-weight: 700; color: var(--teal-700); }
+        .stat-number.completed-color { color: var(--teal-500); }
+        .stat-label { font-size: 0.78rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 500; }
+        .stat-divider { width: 1px; height: 36px; background: var(--teal-200); }
+
+        /* Section */
+        .section-title { font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 600; color: var(--slate-800); margin-bottom: 4px; }
+        .section-desc { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; }
+
+        /* Task List */
+        .task-list { display: flex; flex-direction: column; gap: 12px; }
+
+        /* Task Card */
+        .task-card {
+            display: flex; align-items: flex-start; gap: 16px;
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 18px 20px; box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+            cursor: pointer;
+            animation: fadeSlideIn 0.35s ease both;
+        }
+        .task-card:hover { box-shadow: var(--shadow-md); border-color: var(--teal-300); transform: translateY(-1px); }
+        .task-card.completed { background: var(--teal-50); border-color: var(--teal-200); opacity: 0.75; }
+        .task-card.completed .task-title { text-decoration: line-through; color: var(--slate-400); }
+        .task-card.completed .task-desc { color: var(--slate-400); }
+
+        .task-card:nth-child(1) { animation-delay: 0.05s; }
+        .task-card:nth-child(2) { animation-delay: 0.10s; }
+        .task-card:nth-child(3) { animation-delay: 0.15s; }
+        .task-card:nth-child(4) { animation-delay: 0.20s; }
+        .task-card:nth-child(5) { animation-delay: 0.25s; }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Checkbox */
+        .checkbox-wrapper { flex-shrink: 0; margin-top: 2px; }
+        .checkbox-wrapper input[type="checkbox"] { display: none; }
+        .checkmark {
+            width: 26px; height: 26px;
+            border: 2px solid var(--teal-300); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.25s ease; background: transparent;
+        }
+        .checkmark svg { opacity: 0; transform: scale(0.5); transition: all 0.2s ease; }
+        .checkbox-wrapper input:checked + .checkmark { background: linear-gradient(135deg, var(--teal-400), var(--teal-500)); border-color: var(--teal-500); }
+        .checkbox-wrapper input:checked + .checkmark svg { opacity: 1; transform: scale(1); }
+        .task-card:hover .checkmark { border-color: var(--teal-400); }
+
+        /* Task Content */
+        .task-content { flex: 1; min-width: 0; }
+        .task-title { font-weight: 600; font-size: 0.98rem; color: var(--slate-800); margin-bottom: 4px; line-height: 1.35; transition: color 0.25s ease; }
+        .task-desc { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.45; margin-bottom: 8px; transition: color 0.25s ease; }
+        .task-meta { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+
+        .meta-tag {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 0.75rem; font-weight: 500; padding: 3px 10px;
+            border-radius: 20px; letter-spacing: 0.2px;
+        }
+        .meta-tag.deadline { background: var(--blue-50); color: var(--blue-500); border: 1px solid var(--blue-200); }
+        .meta-tag.deadline.overdue { background: #fef2f2; color: #e74c4c; border-color: #fecaca; }
+        .meta-tag.status-done { background: var(--teal-50); color: var(--teal-600); border: 1px solid var(--teal-200); }
+
+        /* Empty State */
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+        .empty-state svg { margin-bottom: 16px; }
+        .empty-state p { font-size: 0.92rem; }
+
+        /* Loading */
+        .loading { display: flex; justify-content: center; padding: 48px 0; }
+        .spinner { width: 36px; height: 36px; border: 3px solid var(--teal-100); border-top-color: var(--teal-500); border-radius: 50%; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 28px; left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--slate-900); color: #fff;
+            padding: 12px 24px; border-radius: 12px;
+            font-size: 0.88rem; font-weight: 500;
+            box-shadow: var(--shadow-lg); z-index: 999;
+            opacity: 0; transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+            pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* Responsive */
+        @media (max-width: 520px) {
+            .container { padding: 28px 14px 60px; }
+            .stats-bar { gap: 16px; padding: 16px 20px; }
+            .stat-number { font-size: 1.35rem; }
+            .task-card { padding: 14px 16px; gap: 12px; }
+            .logo h1 { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating background shapes -->
+    <div class="bg-shape bg-shape-1"></div>
+    <div class="bg-shape bg-shape-2"></div>
+    <div class="bg-shape bg-shape-3"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                        <circle cx="14" cy="14" r="12" stroke="currentColor" stroke-width="2"/>
+                        <path d="M9 14.5L12.5 18L19 11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h1>UniSync</h1>
+            </div>
+            <p class="subtitle">Study Task Manager</p>
+        </header>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-number" id="totalCount">0</span>
+                <span class="stat-label">Total Tasks</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-number" id="pendingCount">0</span>
+                <span class="stat-label">Pending</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-number completed-color" id="completedCount">0</span>
+                <span class="stat-label">Completed</span>
+            </div>
+        </div>
+
+        <!-- Task List -->
+        <div class="task-section">
+            <h2 class="section-title">Your Study Tasks</h2>
+            <p class="section-desc">Click the checkbox to mark a task as completed</p>
+            <div id="taskList" class="task-list"></div>
+            <div id="emptyState" class="empty-state" style="display:none;">
+                <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                    <circle cx="32" cy="32" r="30" stroke="var(--teal-300)" stroke-width="2" stroke-dasharray="6 4"/>
+                    <path d="M22 33L29 40L42 26" stroke="var(--teal-400)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <p>No tasks found. Add some tasks to get started!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // UniSync - Frontend JavaScript
+        // ============================================
+
+        // IMPORTANT: Update this URL to match your backend location
+        const API_URL = "backend.php";
+
+        const taskListEl       = document.getElementById("taskList");
+        const emptyStateEl     = document.getElementById("emptyState");
+        const totalCountEl     = document.getElementById("totalCount");
+        const pendingCountEl   = document.getElementById("pendingCount");
+        const completedCountEl = document.getElementById("completedCount");
+
+        // ---- Load all tasks ----
+        async function loadTasks() {
+            taskListEl.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+            try {
+                const res  = await fetch(API_URL + "?action=list");
+                const json = await res.json();
+
+                if (json.status === "success") {
+                    renderTasks(json.data);
+                    updateStats(json.data);
+                } else {
+                    taskListEl.innerHTML = '<p style="color:red;">Error loading tasks.</p>';
+                }
+            } catch (err) {
+                console.error("Fetch error:", err);
+                taskListEl.innerHTML = '<p style="color:red;">Could not connect to server.</p>';
+            }
+        }
+
+        // ---- Render task cards ----
+        function renderTasks(tasks) {
+            if (tasks.length === 0) {
+                taskListEl.innerHTML = "";
+                emptyStateEl.style.display = "block";
+                return;
+            }
+            emptyStateEl.style.display = "none";
+            taskListEl.innerHTML = tasks.map(task => createTaskCard(task)).join("");
+        }
+
+        // ---- Build a single task card ----
+        function createTaskCard(task) {
+            const isChecked   = task.is_completed ? "checked" : "";
+            const doneClass   = task.is_completed ? "completed" : "";
+            const deadlineTag = formatDeadline(task.deadline, task.is_completed);
+            const statusTag   = task.is_completed
+                ? '<span class="meta-tag status-done">&#10003; Completed</span>'
+                : "";
+
+            return `
+                <div class="task-card ${doneClass}" onclick="toggleTask(${task.id})">
+                    <label class="checkbox-wrapper" onclick="event.stopPropagation()">
+                        <input type="checkbox" ${isChecked} onchange="toggleTask(${task.id})">
+                        <span class="checkmark">
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                <path d="M3 7.5L5.5 10L11 4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                    </label>
+                    <div class="task-content">
+                        <div class="task-title">${escapeHtml(task.title)}</div>
+                        ${task.description ? '<div class="task-desc">' + escapeHtml(task.description) + '</div>' : ""}
+                        <div class="task-meta">
+                            ${deadlineTag}
+                            ${statusTag}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ---- Toggle completion ----
+        async function toggleTask(id) {
+            try {
+                const res = await fetch(API_URL + "?action=toggle", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id: id })
+                });
+                const json = await res.json();
+
+                if (json.status === "success") {
+                    loadTasks();
+                    showToast("Task status updated!");
+                } else {
+                    showToast("Failed to update task.");
+                }
+            } catch (err) {
+                console.error("Toggle error:", err);
+                showToast("Server error. Try again.");
+            }
+        }
+
+        // ---- Update stat counters ----
+        function updateStats(tasks) {
+            const total     = tasks.length;
+            const completed = tasks.filter(t => t.is_completed).length;
+            const pending   = total - completed;
+
+            animateCount(totalCountEl, total);
+            animateCount(pendingCountEl, pending);
+            animateCount(completedCountEl, completed);
+        }
+
+        function animateCount(el, target) {
+            const current = parseInt(el.textContent) || 0;
+            if (current === target) { el.textContent = target; return; }
+            let start = current;
+            const step = target > current ? 1 : -1;
+            const interval = setInterval(() => {
+                start += step;
+                el.textContent = start;
+                if (start === target) clearInterval(interval);
+            }, 80);
+        }
+
+        // ---- Format deadline tag ----
+        function formatDeadline(deadline, isCompleted) {
+            if (!deadline) return "";
+            const d = new Date(deadline);
+            const now = new Date();
+            const overdue = !isCompleted && d < now;
+            const options = { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" };
+            const label = d.toLocaleDateString("en-US", options);
+
+            return '<span class="meta-tag deadline ' + (overdue ? "overdue" : "") + '">' +
+                '<svg width="12" height="12" viewBox="0 0 12 12" fill="none">' +
+                    '<circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/>' +
+                    '<path d="M6 3.5V6L7.5 7.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>' +
+                '</svg> ' + label + '</span>';
+        }
+
+        // ---- Toast notification ----
+        function showToast(msg) {
+            let toast = document.querySelector(".toast");
+            if (!toast) {
+                toast = document.createElement("div");
+                toast.className = "toast";
+                document.body.appendChild(toast);
+            }
+            toast.textContent = msg;
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 2400);
+        }
+
+        // ---- Escape HTML ----
+        function escapeHtml(str) {
+            const div = document.createElement("div");
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ---- Init ----
+        document.addEventListener("DOMContentLoaded", loadTasks);
+    </script>
+</body>
+</html>
