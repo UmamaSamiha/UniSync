@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= group.name %> | UniSync</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <a href="/study-groups" class="btn btn-secondary">← Back to Groups</a>
+
+    <div class="group-header">
+      <div>
+        <h1><%= group.name %></h1>
+        <span class="badge"><%= group.subject %></span>
+        <p><%= group.description || 'No description provided.' %></p>
+        <small>Created by <strong><%= group.created_by %></strong></small>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <!-- Members -->
+      <div class="section">
+        <div class="section-header">
+          <h2>👥 Members (<%= members.length %>)</h2>
+          <a href="/study-groups/<%= group.id %>/join" class="btn">+ Join</a>
+        </div>
+        <% if (members.length === 0) { %>
+          <p class="empty">No members yet!</p>
+        <% } else { %>
+          <% members.forEach(member => { %>
+            <div class="member-card">
+              <div class="member-avatar"><%= member.student_name.charAt(0).toUpperCase() %></div>
+              <div class="member-info">
+                <strong><%= member.student_name %></strong>
+                <span class="member-id">ID: <%= member.student_id %></span>
+                <span>📚 <%= member.major %> — <%= member.semester %> Sem</span>
+                <span>🎯 <%= member.subject_interest %></span>
+                <span>📧 <%= member.email %></span>
+                <span>📞 <%= member.contact %></span>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+
+      <!-- Posts -->
+      <div class="section">
+        <div class="section-header">
+          <h2>📝 Posts (<%= posts.length %>)</h2>
+          <a href="/study-groups/<%= group.id %>/posts/create" class="btn">+ Post</a>
+        </div>
+        <% if (posts.length === 0) { %>
+          <p class="empty">No posts yet. Start something!</p>
+        <% } else { %>
+          <% posts.forEach(post => { %>
+            <div class="post-card">
+              <div class="post-type <%= post.type %>">
+                <%= post.type === 'task' ? '📋 TASK' :
+                    post.type === 'discussion' ? '💬 DISCUSSION' :
+                    post.type === 'bigbrain' ? '🧠 BIG BRAIN' : '💀 BRAINROT' %>
+              </div>
+              <h3><%= post.title %></h3>
+              <p><%= post.content %></p>
+              <small>Posted by <strong><%= post.posted_by %></strong></small>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

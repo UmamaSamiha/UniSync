@@ -37,6 +37,24 @@ const studyGroupController = {
             res.status(500).send('Server error');
         }
     },
+    // GET /study-groups/:id — show single group with members and posts
+    show: async (req, res) => {
+        try {
+            const group = await StudyGroup.getById(req.params.id);
+            if (!group) return res.status(404).send('Group not found');
+
+            const GroupMember = require('../models/GroupMember');
+            const GroupPost = require('../models/GroupPost');
+
+            const members = await GroupMember.getByGroup(req.params.id);
+            const posts = await GroupPost.getByGroup(req.params.id);
+
+            res.render('studyGroups/show', { group, members, posts });
+        } catch (err) {
+            console.error('SHOW ERROR:', err.message);
+            res.status(500).send('Server error: ' + err.message);
+        }
+    },
 };
 
 module.exports = studyGroupController;

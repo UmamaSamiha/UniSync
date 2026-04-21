@@ -22,6 +22,8 @@
                         <span class="badge"><%= group.subject %></span>
                         <p><%= group.description || 'No description provided.' %></p>
                         <small>Created by <strong><%= group.created_by %></strong></small>
+                        <br><br>
+                        <a href="/study-groups/<%= group.id %>" class="btn">View Group →</a>
                     </div>
                 <% }) %>
             </div>

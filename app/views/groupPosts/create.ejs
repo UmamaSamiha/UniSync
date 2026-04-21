@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>New Post | UniSync</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <a href="/study-groups/<%= group.id %>" class="btn btn-secondary">← Back</a>
+
+    <div class="form-card">
+      <div class="form-title">
+        <h1>Create a Post</h1>
+        <p>Posting in <strong><%= group.name %></strong></p>
+      </div>
+
+      <% if (error) { %>
+        <p class="error">⚠️ <%= error %></p>
+      <% } %>
+
+      <form action="/study-groups/<%= group.id %>/posts" method="POST">
+
+        <div class="form-group">
+          <label>Your Name <span class="req">★</span></label>
+          <input type="text" name="posted_by" placeholder="e.g. Jung Hoseok" required />
+        </div>
+
+        <div class="form-group">
+          <label>Post Type <span class="req">★</span></label>
+          <div class="type-grid">
+            <label class="type-option">
+              <input type="radio" name="type" value="task" required />
+              <div class="type-card">
+                <span class="type-icon">📋</span>
+                <span class="type-label">Study Task</span>
+                <span class="type-desc">Assign or share a study task</span>
+              </div>
+            </label>
+            <label class="type-option">
+              <input type="radio" name="type" value="discussion" />
+              <div class="type-card">
+                <span class="type-icon">💬</span>
+                <span class="type-label">Discussion</span>
+                <span class="type-desc">Start a study discussion</span>
+              </div>
+            </label>
+            <label class="type-option">
+              <input type="radio" name="type" value="bigbrain" />
+              <div class="type-card">
+                <span class="type-icon">🧠</span>
+                <span class="type-label">Big Brain</span>
+                <span class="type-desc">Share a big brain moment</span>
+              </div>
+            </label>
+            <label class="type-option">
+              <input type="radio" name="type" value="brainrot" />
+              <div class="type-card">
+                <span class="type-icon">💀</span>
+                <span class="type-label">Brainrot</span>
+                <span class="type-desc">Just vibing, no thoughts</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Title <span class="req">★</span></label>
+          <input type="text" name="title" placeholder="Give your post a title..." required />
+        </div>
+
+        <div class="form-group">
+          <label>Content <span class="req">★</span></label>
+          <textarea name="content" rows="5"
+            placeholder="Write your post here..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-full">✨ Post It</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

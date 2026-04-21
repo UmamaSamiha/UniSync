@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Join Group | UniSync</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <a href="/study-groups/<%= group.id %>" class="btn btn-secondary">← Back</a>
+
+    <div class="form-card">
+      <div class="form-title">
+        <h1>Join Study Group</h1>
+        <p>You're joining <strong><%= group.name %></strong> — <span class="badge"><%= group.subject %></span></p>
+      </div>
+
+      <% if (error) { %>
+        <p class="error">⚠️ <%= error %></p>
+      <% } %>
+
+      <form action="/study-groups/<%= group.id %>/join" method="POST">
+
+        <div class="form-section-title">👤 Personal Info</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name <span class="req">★</span></label>
+            <input type="text" name="student_name" placeholder="e.g. Kim Seokjin" required />
+          </div>
+          <div class="form-group">
+            <label>Student ID <span class="req">★</span> <small>(8 digits)</small></label>
+            <input type="text" name="student_id" placeholder="e.g. 23101000" maxlength="8" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email Address <span class="req">★</span></label>
+            <input type="email" name="email" placeholder="e.g. kim.taehyung@g.bracu.ac.bd" required />
+          </div>
+          <div class="form-group">
+            <label>Contact Number <span class="req">★</span> <small>(11 digits)</small></label>
+            <input type="text" name="contact" placeholder="e.g. 01613434097" maxlength="11" required />
+          </div>
+        </div>
+
+        <div class="form-section-title">📚 Academic Info</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Major / Department <span class="req">★</span></label>
+            <input type="text" name="major" placeholder="e.g. Computer Science" required />
+          </div>
+          <div class="form-group">
+            <label>Current Semester <span class="req">★</span></label>
+            <select name="semester" required>
+              <option value="">-- Select Semester --</option>
+              <option value="1st">1st Semester</option>
+              <option value="2nd">2nd Semester</option>
+              <option value="3rd">3rd Semester</option>
+              <option value="4th">4th Semester</option>
+              <option value="5th">5th Semester</option>
+              <option value="6th">6th Semester</option>
+              <option value="7th">7th Semester</option>
+              <option value="8th">8th Semester</option>
+              <option value="9th">9th Semester</option>
+              <option value="10th">10th Semester</option>
+              <option value="11th">11th Semester</option>
+              <option value="12th">12th Semester</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Subjects of Interest <span class="req">★</span></label>
+          <input type="text" name="subject_interest"
+            placeholder="e.g. Data Structures, Algorithms, Web Development" required />
+          <small class="hint">Separate multiple subjects with commas</small>
+        </div>
+
+        <button type="submit" class="btn btn-full">🚀 Join Group</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

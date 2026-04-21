@@ -18,6 +18,14 @@ class StudyGroup {
     );
     return result.insertId;
   }
+
+  static async getById(id) {
+    const [rows] = await db.query(
+      'SELECT * FROM study_groups WHERE id = ?',
+      [id]
+    );
+    return rows[0];
+  }
 }
 
 module.exports = StudyGroup;
