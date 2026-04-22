@@ -39,7 +39,33 @@ const sendTutorRequest = async (req, res) => {
     }
 };
 
+// Fetch pending requests for a specific tutor
+const getTutorRequests = async (req, res) => {
+    const tutorId = req.params.tutorId;
+    try {
+        const [rows] = await db.execute("SELECT * FROM requests WHERE tutor_id = ? AND status = 'pending'", [tutorId]);
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "❌ Error fetching requests" });
+    }
+};
+
+// Accept or Reject a request
+const updateRequestStatus = async (req, res) => {
+    const requestId = req.params.id;
+    const { status } = req.body; // This will be either 'accepted' or 'rejected'
+    
+    try {
+        await db.execute("UPDATE requests SET status = ? WHERE id = ?", [status, requestId]);
+        res.status(200).json({ message: `✅ Request ${status} successfully!` });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "❌ Error updating status" });
+    }
+};
+
 module.exports = {
-    createRequest, getTutors, sendTutorRequest
+    createRequest, getTutors, sendTutorRequest, getTutorRequests, updateRequestStatus
 };
 
