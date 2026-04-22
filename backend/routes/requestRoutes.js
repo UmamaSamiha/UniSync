@@ -5,7 +5,8 @@ const {
     getTutors, 
     sendTutorRequest, 
     getTutorRequests, 
-    updateRequestStatus 
+    updateRequestStatus,
+    getStudentRequests
 } = require('../controllers/requestController');
 
 // Existing Routes
@@ -17,5 +18,6 @@ router.post('/send-request', sendTutorRequest);
 router.get('/tutor-dashboard/:tutorId', getTutorRequests);
 router.put('/:id/status', updateRequestStatus);
 
+router.get('/student-dashboard/:email', getStudentRequests);
 // THIS MUST BE THE ABSOLUTE LAST LINE
 module.exports = router;

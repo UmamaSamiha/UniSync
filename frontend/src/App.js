@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import TutorList from './TutorList';
 import TutorDashboard from './TutorDashboard';
+import StudentDashboard from './StudentDashboard';
 
 function App() {
   const [formData, setFormData] = useState({
@@ -54,6 +55,7 @@ function App() {
       <hr />
       <TutorList />
       <TutorDashboard />
+      <StudentDashboard />
     </div>
   );
 }

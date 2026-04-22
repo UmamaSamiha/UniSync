@@ -65,7 +65,19 @@ const updateRequestStatus = async (req, res) => {
     }
 };
 
+// Fetch all requests made by a specific student
+const getStudentRequests = async (req, res) => {
+    const email = req.params.email;
+    try {
+        const [rows] = await db.execute("SELECT * FROM requests WHERE student_email = ?", [email]);
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "❌ Error fetching student requests" });
+    }
+};
+
 module.exports = {
-    createRequest, getTutors, sendTutorRequest, getTutorRequests, updateRequestStatus
+    createRequest, getTutors, sendTutorRequest, getTutorRequests, updateRequestStatus, getStudentRequests
 };
 
