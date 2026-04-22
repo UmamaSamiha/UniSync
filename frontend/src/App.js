@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import TutorList from './TutorList';
 
 function App() {
   const [formData, setFormData] = useState({
@@ -49,6 +50,8 @@ function App() {
           Submit Request
         </button>
       </form>
+      <hr />
+      <TutorList />
     </div>
   );
 }
