@@ -1,63 +1,37 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import TutorList from './TutorList';
 import TutorDashboard from './TutorDashboard';
 import StudentDashboard from './StudentDashboard';
+import BecomeTutor from './BecomeTutor';
+import Login from './Login';
 
 function App() {
-  const [formData, setFormData] = useState({
-    studentName: '',
-    courseCode: '',
-    topic: ''
-  });
+    const [user, setUser] = useState(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      // This sends the data to your Backend running on port 5000
-      const response = await axios.post('http://localhost:5000/api/requests', formData);
-      alert("✅ Request Sent Successfully!");
-      console.log(response.data);
-      // Clear form
-      setFormData({ studentName: '', courseCode: '', topic: '' });
-    } catch (err) {
-      console.error(err);
-      alert("❌ Error sending request. Is the backend running?");
+    // 1. Logic Gate: Show login if no user is found
+    if (!user) {
+        return <Login onLoginSuccess={(userData) => setUser(userData)} />;
     }
-  };
 
-  return (
-    <div style={{ padding: '50px', fontFamily: 'Arial, sans-serif' }}>
-      <h1>Peer Tutoring Request</h1>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px', maxWidth: '400px' }}>
-        <input 
-          type="text" placeholder="Your Name" required 
-          value={formData.studentName}
-          onChange={(e) => setFormData({...formData, studentName: e.target.value})}
-          style={{ padding: '10px' }}
-        />
-        <input 
-          type="text" placeholder="Course Code (e.g. CSE470)" required 
-          value={formData.courseCode}
-          onChange={(e) => setFormData({...formData, courseCode: e.target.value})}
-          style={{ padding: '10px' }}
-        />
-        <textarea 
-          placeholder="What topic do you need help with?" required 
-          value={formData.topic}
-          onChange={(e) => setFormData({...formData, topic: e.target.value})}
-          style={{ padding: '10px', minHeight: '100px' }}
-        />
-        <button type="submit" style={{ padding: '10px', background: '#007bff', color: 'white', border: 'none', cursor: 'pointer' }}>
-          Submit Request
-        </button>
-      </form>
-      <hr />
-      <TutorList />
-      <TutorDashboard />
-      <StudentDashboard />
-    </div>
-  );
+    // 2. The Main App: Only accessible after login
+    return (
+        <div className="App" style={{ padding: '20px', fontFamily: 'Arial' }}>
+            <header style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #ccc' }}>
+                <h1>Welcome, {user.name}</h1>
+                <button onClick={() => setUser(null)} style={{ margin: '20px', height: '30px' }}>Logout</button>
+            </header>
+
+            <main>
+                <BecomeTutor currentUser={user} />
+                <hr />
+                <TutorList currentUser={user} />
+                <hr />
+                <StudentDashboard currentUser={user} />
+                <hr />
+                <TutorDashboard currentUser={user} />
+            </main>
+        </div>
+    );
 }
 
 export default App;

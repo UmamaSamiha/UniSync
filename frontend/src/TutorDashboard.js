@@ -1,36 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const TutorDashboard = () => {
+const TutorDashboard = ({ currentUser }) => {
     const [requests, setRequests] = useState([]);
-    const tutorId = 1; // Hardcoded for testing (Anika's ID). Later, get this from user login.
 
-    // Function to fetch the data
+    // Use the ID from the logged-in user instead of a hardcoded number
+    const tutorId = currentUser.id;
+
+    // Function to fetch the pending requests for THIS tutor
     const fetchRequests = () => {
         axios.get(`http://localhost:5000/api/requests/tutor-dashboard/${tutorId}`)
             .then(res => setRequests(res.data))
             .catch(err => console.error("Error fetching requests:", err));
     };
 
-    // Run this when the page loads
+    // Run this when the component loads or when the user changes
     useEffect(() => {
-        fetchRequests();
-    }, []);
+        if (tutorId) {
+            fetchRequests();
+        }
+    }, [tutorId]);
 
     // Function to handle Accept/Reject buttons
     const handleAction = async (id, status) => {
         try {
             const response = await axios.put(`http://localhost:5000/api/requests/${id}/status`, { status });
             alert(response.data.message);
-            fetchRequests(); // Refresh the list so the card disappears!
+            fetchRequests(); // Refresh the list so the card disappears (moves to student's history)
         } catch (err) {
-            alert("Error updating request");
+            console.error(err);
+            alert("❌ Error updating request");
         }
     };
 
     const cardStyle = {
-        border: '1px solid #ccc', borderRadius: '8px', padding: '15px', 
-        margin: '10px 0', backgroundColor: '#fdfdfd', boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
+        border: '1px solid #ccc', 
+        borderRadius: '8px', 
+        padding: '15px', 
+        margin: '10px 0', 
+        backgroundColor: '#fdfdfd', 
+        boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
         maxWidth: '500px'
     };
 
@@ -43,25 +52,31 @@ const TutorDashboard = () => {
                 {requests.length > 0 ? (
                     requests.map(req => (
                         <div key={req.id} style={cardStyle}>
-                            <h4 style={{ margin: '0 0 10px 0' }}>Request from: {req.student_name}</h4>
-                            <p><strong>Course:</strong> {req.course_code}</p>
+                            <h4 style={{ margin: '0 0 10px 0' }}>
+                                Request from: {req.studentName || req.student_name}
+                            </h4>
+                            <p><strong>Course:</strong> {req.courseCode || req.course_code}</p>
                             <p><strong>Email:</strong> {req.student_email}</p>
+                            <p><strong>Topic:</strong> {req.topic || "N/A"}</p>
+                            
                             <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
                                 <button 
                                     onClick={() => handleAction(req.id, 'accepted')}
-                                    style={{ backgroundColor: '#28a745', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer' }}>
+                                    style={{ backgroundColor: '#28a745', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
                                     ✅ Accept
                                 </button>
                                 <button 
                                     onClick={() => handleAction(req.id, 'rejected')}
-                                    style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer' }}>
+                                    style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
                                     ❌ Reject
                                 </button>
                             </div>
                         </div>
                     ))
                 ) : (
-                    <p style={{ color: '#666', fontStyle: 'italic' }}>No pending requests right now.</p>
+                    <p style={{ color: '#666', fontStyle: 'italic' }}>
+                        No pending tutor requests for you right now.
+                    </p>
                 )}
             </div>
         </div>
