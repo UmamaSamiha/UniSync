@@ -1,0 +1,480 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upload Material — UNISYNC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d0f14; --surface: #14171f; --card: #1a1e28;
+      --border: #252a38; --accent: #4f8ef7; --accent2: #7c3aed;
+      --green: #22d3a5; --yellow: #f5c842; --red: #f76f6f;
+      --text: #e8eaf0; --muted: #7a8299; --radius: 14px;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(79,142,247,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,142,247,.04) 1px, transparent 1px);
+      background-size: 40px 40px; pointer-events: none; z-index: 0;
+    }
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.5rem; height: 64px;
+      background: rgba(13,15,20,.85); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--accent); }
+    .nav-logo span { color: var(--text); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+    .back-btn {
+      display: flex; align-items: center; gap: .4rem;
+      color: var(--muted); text-decoration: none; font-size: .85rem;
+      border: 1px solid var(--border); border-radius: 8px; padding: .4rem .9rem;
+      transition: all .2s;
+    }
+    .back-btn:hover { color: var(--text); border-color: var(--text); }
+
+    main {
+      position: relative; z-index: 1;
+      max-width: 680px; margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+    }
+
+    .page-header { margin-bottom: 2.5rem; animation: fadeUp .45s ease both; }
+    .page-eyebrow { font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: .4rem; }
+    .page-title { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; }
+    .page-title span { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .page-sub { color: var(--muted); font-size: .9rem; margin-top: .4rem; }
+
+    /* ── Drop zone ── */
+    .drop-zone {
+      border: 2px dashed var(--border); border-radius: var(--radius);
+      background: var(--card);
+      padding: 3rem 2rem;
+      text-align: center; cursor: pointer;
+      transition: all .25s; margin-bottom: 1.5rem;
+      animation: fadeUp .45s .1s ease both;
+      position: relative;
+    }
+    .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(79,142,247,.06);
+    }
+    .drop-zone.has-file {
+      border-color: var(--green);
+      background: rgba(34,211,165,.05);
+    }
+    .drop-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: rgba(79,142,247,.12);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+    }
+    .drop-icon svg { width: 28px; height: 28px; color: var(--accent); }
+    .drop-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: .35rem; }
+    .drop-sub { color: var(--muted); font-size: .85rem; }
+    .drop-sub span { color: var(--accent); text-decoration: underline; cursor: pointer; }
+    .file-types {
+      display: flex; justify-content: center; gap: .5rem; margin-top: 1rem; flex-wrap: wrap;
+    }
+    .ft-chip {
+      font-size: .72rem; font-weight: 700;
+      border: 1px solid var(--border); border-radius: 6px; padding: .2rem .55rem;
+      color: var(--muted);
+    }
+    #fileInput { display: none; }
+
+    /* file preview */
+    .file-preview {
+      display: none; align-items: center; gap: 1rem;
+      background: rgba(34,211,165,.08); border: 1px solid rgba(34,211,165,.25);
+      border-radius: 10px; padding: .9rem 1.1rem; margin-top: .8rem;
+    }
+    .file-preview.visible { display: flex; }
+    .preview-icon {
+      width: 40px; height: 40px; border-radius: 8px;
+      background: rgba(34,211,165,.15); display: flex; align-items: center;
+      justify-content: center; font-size: .7rem; font-weight: 800; color: var(--green);
+      flex-shrink: 0;
+    }
+    .preview-info { flex: 1; min-width: 0; }
+    .preview-name { font-size: .88rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .preview-size { font-size: .78rem; color: var(--muted); }
+    .remove-file {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      transition: color .2s; padding: .2rem;
+    }
+    .remove-file:hover { color: var(--red); }
+    .remove-file svg { width: 16px; height: 16px; display: block; }
+
+    /* ── Form ── */
+    .form-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2rem;
+      animation: fadeUp .45s .2s ease both;
+    }
+    .form-group { margin-bottom: 1.4rem; }
+    .form-label {
+      display: block; font-size: .82rem; font-weight: 600;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .07em;
+      margin-bottom: .5rem;
+    }
+    .form-label .req { color: var(--red); margin-left: 2px; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: .9rem;
+      padding: .7rem 1rem; outline: none;
+      transition: border-color .2s;
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--muted); }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--accent); }
+    .form-select option { background: var(--surface); }
+    .form-textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+
+    .char-count { font-size: .75rem; color: var(--muted); text-align: right; margin-top: .3rem; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    /* tags input */
+    .tags-wrap {
+      display: flex; flex-wrap: wrap; gap: .4rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: .5rem .7rem;
+      cursor: text; transition: border-color .2s;
+      min-height: 44px; align-items: center;
+    }
+    .tags-wrap:focus-within { border-color: var(--accent); }
+    .tag-chip {
+      display: flex; align-items: center; gap: .3rem;
+      background: rgba(79,142,247,.15); color: var(--accent);
+      border-radius: 6px; padding: .22rem .55rem; font-size: .8rem; font-weight: 600;
+    }
+    .tag-chip button {
+      background: none; border: none; cursor: pointer;
+      color: inherit; font-size: .9rem; line-height: 1; padding: 0;
+    }
+    .tags-input {
+      background: none; border: none; outline: none;
+      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: .9rem;
+      min-width: 80px; flex: 1;
+    }
+    .tags-input::placeholder { color: var(--muted); }
+    .tags-hint { font-size: .75rem; color: var(--muted); margin-top: .3rem; }
+
+    /* submit */
+    .submit-row {
+      display: flex; align-items: center; gap: 1rem;
+      margin-top: 1.8rem;
+    }
+    .submit-btn {
+      display: flex; align-items: center; gap: .55rem;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: var(--radius);
+      padding: .8rem 2rem; font-size: .95rem; font-weight: 700;
+      cursor: pointer; transition: transform .15s, box-shadow .15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(79,142,247,.35); }
+    .submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .cancel-link { color: var(--muted); text-decoration: none; font-size: .88rem; }
+    .cancel-link:hover { color: var(--text); }
+
+    /* progress bar */
+    .progress-wrap { display: none; margin-top: 1.2rem; }
+    .progress-wrap.visible { display: block; }
+    .progress-label { font-size: .82rem; color: var(--muted); margin-bottom: .4rem; display: flex; justify-content: space-between; }
+    .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 3px; width: 0; transition: width .3s; }
+
+    /* success banner */
+    .success-banner {
+      display: none; align-items: center; gap: 1rem;
+      background: rgba(34,211,165,.1); border: 1px solid rgba(34,211,165,.3);
+      border-radius: var(--radius); padding: 1.1rem 1.4rem; margin-top: 1.2rem;
+    }
+    .success-banner.visible { display: flex; }
+    .success-banner svg { width: 22px; height: 22px; color: var(--green); flex-shrink: 0; }
+    .success-banner p { font-size: .9rem; }
+    .success-banner p strong { color: var(--green); }
+
+    @keyframes fadeUp { from { opacity:0; transform: translateY(18px); } to { opacity:1; transform: translateY(0); } }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">UNI<span>SYNC</span></div>
+  <ul class="nav-links">
+    <li><a href="#">Dashboard</a></li>
+    <li><a href="view-resources.html">Resources</a></li>
+    <li><a href="#">Tasks</a></li>
+  </ul>
+  <a href="view-resources.html" class="back-btn">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+    Back
+  </a>
+</nav>
+
+<main>
+  <div class="page-header">
+    <p class="page-eyebrow">📤 Resource Sharing</p>
+    <h1 class="page-title">Upload <span>Material</span></h1>
+    <p class="page-sub">Share your notes, slides, or documents with your peers.</p>
+  </div>
+
+  <!-- Drop Zone -->
+  <div class="drop-zone" id="dropZone">
+    <input type="file" id="fileInput" accept=".pdf,.pptx,.ppt,.docx,.doc,.zip"/>
+    <div class="drop-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+      </svg>
+    </div>
+    <p class="drop-title">Drop your file here</p>
+    <p class="drop-sub">or <span id="browseBtn">browse to upload</span></p>
+    <div class="file-types">
+      <span class="ft-chip">PDF</span>
+      <span class="ft-chip">PPTX</span>
+      <span class="ft-chip">DOCX</span>
+      <span class="ft-chip">ZIP</span>
+      <span class="ft-chip">Max 50 MB</span>
+    </div>
+    <!-- File preview (shown after selection) -->
+    <div class="file-preview" id="filePreview">
+      <div class="preview-icon" id="previewIcon">PDF</div>
+      <div class="preview-info">
+        <div class="preview-name" id="previewName"></div>
+        <div class="preview-size" id="previewSize"></div>
+      </div>
+      <button class="remove-file" id="removeFile" title="Remove">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="form-card">
+    <div class="form-group">
+      <label class="form-label" for="titleInput">Title <span class="req">*</span></label>
+      <input type="text" id="titleInput" class="form-input" placeholder="e.g. Software Engineering Lecture Slides" maxlength="100"/>
+      <p class="char-count"><span id="titleCount">0</span>/100</p>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" for="subjectSelect">Subject <span class="req">*</span></label>
+        <select id="subjectSelect" class="form-select">
+          <option value="">Select subject…</option>
+          <option value="CSE470">CSE470 – Software Engineering</option>
+          <option value="CSE471">CSE471 – Machine Learning</option>
+          <option value="CSE482">CSE482 – Computer Networks</option>
+          <option value="CSE310">CSE310 – Algorithms</option>
+          <option value="MAT215">MAT215 – Discrete Math</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="semesterSelect">Semester</label>
+        <select id="semesterSelect" class="form-select">
+          <option value="">Select semester…</option>
+          <option>Spring 2025</option>
+          <option>Fall 2024</option>
+          <option>Summer 2024</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="descInput">Description</label>
+      <textarea id="descInput" class="form-textarea" placeholder="What's in this file? Any useful context for your peers…" maxlength="300"></textarea>
+      <p class="char-count"><span id="descCount">0</span>/300</p>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Tags</label>
+      <div class="tags-wrap" id="tagsWrap">
+        <input type="text" class="tags-input" id="tagsInput" placeholder="Type tag and press Enter…"/>
+      </div>
+      <p class="tags-hint">e.g. midterm, notes, lab — press Enter or comma to add</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-label">
+        <span>Uploading…</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="success-banner" id="successBanner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      <p><strong>Upload successful!</strong> Your resource is now visible to all students. <a href="view-resources.html" style="color:var(--accent)">View Resources →</a></p>
+    </div>
+
+    <div class="submit-row">
+      <button class="submit-btn" id="submitBtn" disabled>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        Upload Material
+      </button>
+      <a href="view-resources.html" class="cancel-link">Cancel</a>
+    </div>
+  </div>
+</main>
+
+<script>
+  let selectedFile = null;
+  const tags = [];
+
+  // ── Drop zone ──
+  const dropZone   = document.getElementById('dropZone');
+  const fileInput  = document.getElementById('fileInput');
+
+  document.getElementById('browseBtn').addEventListener('click', () => fileInput.click());
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  });
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) handleFile(fileInput.files[0]);
+  });
+
+  function handleFile(file) {
+    const allowed = ['application/pdf','application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'application/vnd.ms-powerpoint','application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/msword','application/zip','application/x-zip-compressed'];
+    if (!allowed.some(t => file.type === t) && !file.name.match(/\.(pdf|pptx|ppt|docx|doc|zip)$/i)) {
+      alert('Please upload a PDF, PPTX, DOCX, or ZIP file.'); return;
+    }
+    if (file.size > 50 * 1024 * 1024) { alert('File is too large. Max 50 MB.'); return; }
+    selectedFile = file;
+    const ext = file.name.split('.').pop().toUpperCase();
+    document.getElementById('previewIcon').textContent = ext;
+    document.getElementById('previewName').textContent = file.name;
+    document.getElementById('previewSize').textContent = formatSize(file.size);
+    document.getElementById('filePreview').classList.add('visible');
+    dropZone.classList.add('has-file');
+    checkSubmit();
+  }
+
+  document.getElementById('removeFile').addEventListener('click', e => {
+    e.stopPropagation(); selectedFile = null;
+    document.getElementById('filePreview').classList.remove('visible');
+    dropZone.classList.remove('has-file');
+    fileInput.value = ''; checkSubmit();
+  });
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/1024/1024).toFixed(1) + ' MB';
+  }
+
+  // ── Char counters ──
+  document.getElementById('titleInput').addEventListener('input', function() {
+    document.getElementById('titleCount').textContent = this.value.length;
+    checkSubmit();
+  });
+  document.getElementById('descInput').addEventListener('input', function() {
+    document.getElementById('descCount').textContent = this.value.length;
+  });
+  document.getElementById('subjectSelect').addEventListener('change', checkSubmit);
+
+  function checkSubmit() {
+    const ok = selectedFile &&
+               document.getElementById('titleInput').value.trim() &&
+               document.getElementById('subjectSelect').value;
+    document.getElementById('submitBtn').disabled = !ok;
+  }
+
+  // ── Tags ──
+  const tagsInput = document.getElementById('tagsInput');
+  tagsInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const val = tagsInput.value.trim().replace(/,/g,'');
+      if (val && !tags.includes(val) && tags.length < 8) {
+        tags.push(val);
+        renderTags();
+      }
+      tagsInput.value = '';
+    }
+    if (e.key === 'Backspace' && !tagsInput.value && tags.length) {
+      tags.pop(); renderTags();
+    }
+  });
+
+  function renderTags() {
+    document.querySelectorAll('.tag-chip').forEach(el => el.remove());
+    const wrap = document.getElementById('tagsWrap');
+    tags.forEach((t, i) => {
+      const chip = document.createElement('span');
+      chip.className = 'tag-chip';
+      chip.innerHTML = `${t}<button onclick="removeTag(${i})">×</button>`;
+      wrap.insertBefore(chip, tagsInput);
+    });
+  }
+  function removeTag(i) { tags.splice(i,1); renderTags(); }
+
+  // ── Submit (simulated — will POST to /api/resources in Sprint 2) ──
+  document.getElementById('submitBtn').addEventListener('click', () => {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+
+    // Show progress bar
+    const pw = document.getElementById('progressWrap');
+    const pf = document.getElementById('progressFill');
+    const pp = document.getElementById('progressPct');
+    pw.classList.add('visible');
+
+    let pct = 0;
+    const interval = setInterval(() => {
+      pct = Math.min(pct + Math.random() * 18, 95);
+      pf.style.width = pct + '%';
+      pp.textContent = Math.round(pct) + '%';
+    }, 200);
+
+    // Simulate network delay — in Sprint 2 replaced by:
+    // const formData = new FormData();
+    // formData.append('file', selectedFile);
+    // formData.append('title', titleInput.value);
+    // formData.append('subject', subjectSelect.value);
+    // await fetch('/api/resources/upload', { method: 'POST', body: formData });
+    setTimeout(() => {
+      clearInterval(interval);
+      pf.style.width = '100%'; pp.textContent = '100%';
+      setTimeout(() => {
+        pw.classList.remove('visible');
+        document.getElementById('successBanner').classList.add('visible');
+      }, 400);
+    }, 2200);
+  });
+</script>
+</body>
