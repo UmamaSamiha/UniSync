@@ -20,6 +20,22 @@ const TutorList = () => {
         maxWidth: '500px'
     };
 
+const handleRequest = async (tutorId, courseCode) => {
+    // For now, we use dummy student data. Later this will come from your Login/Session.
+    const requestData = {
+        student_name: "Test Student", 
+        student_email: "student@test.com",
+        tutor_id: tutorId,
+        course_code: courseCode
+    };
+
+    try {
+        const response = await axios.post('http://localhost:5000/api/requests/send-request', requestData);
+        alert(response.data.message);
+    } catch (err) {
+        alert("Error sending request");
+    }
+};
     return (
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
             <h2 style={{ color: '#333', borderBottom: '2px solid #007bff', display: 'inline-block' }}>
@@ -33,12 +49,19 @@ const TutorList = () => {
                             <p><strong>📚 Subject:</strong> {tutor.subject}</p>
                             <p><strong>⭐ Rating:</strong> {tutor.rating} / 5.0</p>
                             <p style={{ color: '#666', fontStyle: 'italic' }}>"{tutor.bio}"</p>
-                            <button style={{ 
-                                backgroundColor: '#28a745', color: 'white', border: 'none', 
-                                padding: '8px 15px', borderRadius: '5px', cursor: 'pointer' 
-                            }}>
-                                Request Session
-                            </button>
+                            <button 
+    onClick={() => handleRequest(tutor.id, tutor.subject)}
+    style={{ 
+        backgroundColor: '#28a745', 
+        color: 'white', 
+        border: 'none', 
+        padding: '8px 15px', 
+        borderRadius: '5px', 
+        cursor: 'pointer' 
+    }}
+>
+    Request Session
+</button>
                         </div>
                     ))
                 ) : (

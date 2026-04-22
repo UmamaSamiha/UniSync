@@ -26,6 +26,20 @@ const getTutors = async (req, res) => {
     }
 };
 
-module.exports = {
-    createRequest, getTutors
+const sendTutorRequest = async (req, res) => {
+    const { student_name, student_email, tutor_id, course_code } = req.body;
+    
+    try {
+        const query = "INSERT INTO requests (student_name, student_email, tutor_id, course_code, status) VALUES (?, ?, ?, ?, 'pending')";
+        await db.execute(query, [student_name, student_email, tutor_id, course_code]);
+        res.status(201).json({ message: "✅ Request sent successfully!" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "❌ Failed to send request" });
+    }
 };
+
+module.exports = {
+    createRequest, getTutors, sendTutorRequest
+};
+
