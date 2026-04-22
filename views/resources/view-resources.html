@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shared Resources — UNISYNC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0f14;
+      --surface:   #14171f;
+      --card:      #1a1e28;
+      --border:    #252a38;
+      --accent:    #4f8ef7;
+      --accent2:   #7c3aed;
+      --green:     #22d3a5;
+      --yellow:    #f5c842;
+      --red:       #f76f6f;
+      --text:      #e8eaf0;
+      --muted:     #7a8299;
+      --radius:    14px;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── background grid ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(79,142,247,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,142,247,.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── navbar ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 64px;
+      background: rgba(13,15,20,.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.3rem;
+      color: var(--accent);
+      letter-spacing: -.5px;
+    }
+    .nav-logo span { color: var(--text); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none;
+      font-size: .9rem; font-weight: 500;
+      transition: color .2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--text); }
+    .nav-links a.active {
+      position: relative;
+    }
+    .nav-links a.active::after {
+      content: '';
+      position: absolute; bottom: -4px; left: 0; right: 0;
+      height: 2px; background: var(--accent); border-radius: 2px;
+    }
+    .nav-cta {
+      background: var(--accent);
+      color: #fff; border: none; border-radius: 8px;
+      padding: .45rem 1.1rem; font-size: .85rem; font-weight: 600;
+      cursor: pointer; transition: opacity .2s;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: none;
+    }
+    .nav-cta:hover { opacity: .85; }
+
+    /* ── main layout ── */
+    main {
+      position: relative; z-index: 1;
+      max-width: 1200px; margin: 0 auto;
+      padding: 3rem 2rem 6rem;
+    }
+
+    /* ── page header ── */
+    .page-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap; gap: 1.5rem;
+      animation: fadeUp .5s ease both;
+    }
+    .page-title-wrap {}
+    .page-eyebrow {
+      font-size: .78rem; font-weight: 600; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: .4rem;
+    }
+    .page-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.2rem; font-weight: 800;
+      line-height: 1.1;
+      color: var(--text);
+    }
+    .page-title span {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .upload-btn {
+      display: flex; align-items: center; gap: .5rem;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: var(--radius);
+      padding: .7rem 1.4rem; font-size: .9rem; font-weight: 600;
+      cursor: pointer; transition: transform .15s, box-shadow .15s;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .upload-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(79,142,247,.35);
+    }
+    .upload-btn svg { width: 17px; height: 17px; }
+
+    /* ── stats row ── */
+    .stats-row {
+      display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;
+      animation: fadeUp .5s .1s ease both;
+    }
+    .stat-chip {
+      display: flex; align-items: center; gap: .6rem;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 50px; padding: .45rem 1rem;
+      font-size: .82rem; color: var(--muted);
+    }
+    .stat-chip strong { color: var(--text); font-weight: 600; }
+    .stat-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+
+    /* ── filter bar ── */
+    .filter-bar {
+      display: flex; gap: 1rem; align-items: center;
+      margin-bottom: 2rem; flex-wrap: wrap;
+      animation: fadeUp .5s .15s ease both;
+    }
+    .search-wrap {
+      position: relative; flex: 1; min-width: 220px;
+    }
+    .search-wrap svg {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); width: 16px; height: 16px; pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text); font-family: 'DM Sans', sans-serif;
+      font-size: .9rem; padding: .65rem .9rem .65rem 2.4rem;
+      outline: none; transition: border-color .2s;
+    }
+    .search-input::placeholder { color: var(--muted); }
+    .search-input:focus { border-color: var(--accent); }
+
+    .filter-select {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text); font-family: 'DM Sans', sans-serif;
+      font-size: .88rem; padding: .65rem 1rem;
+      outline: none; cursor: pointer; transition: border-color .2s;
+      min-width: 150px;
+    }
+    .filter-select:focus { border-color: var(--accent); }
+    .filter-select option { background: var(--surface); }
+
+    .view-toggle { display: flex; gap: .3rem; }
+    .view-btn {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: .55rem .7rem;
+      color: var(--muted); cursor: pointer; transition: all .2s;
+      display: flex; align-items: center;
+    }
+    .view-btn.active, .view-btn:hover {
+      background: var(--border); color: var(--text);
+    }
+    .view-btn svg { width: 16px; height: 16px; }
+
+    /* ── resource grid ── */
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.25rem;
+      animation: fadeUp .5s .2s ease both;
+    }
+    .resources-grid.list-view {
+      grid-template-columns: 1fr;
+    }
+
+    /* ── resource card ── */
+    .resource-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      transition: border-color .25s, transform .25s, box-shadow .25s;
+      cursor: pointer;
+      position: relative; overflow: hidden;
+    }
+    .resource-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      opacity: 0; transition: opacity .25s;
+    }
+    .resource-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,.3);
+    }
+    .resource-card:hover::before { opacity: 1; }
+
+    /* type accent lines */
+    .resource-card[data-type="pdf"]::before   { background: var(--red); }
+    .resource-card[data-type="pptx"]::before  { background: var(--yellow); }
+    .resource-card[data-type="docx"]::before  { background: var(--accent); }
+    .resource-card[data-type="zip"]::before   { background: var(--green); }
+
+    .card-top {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: .8rem;
+      margin-bottom: 1rem;
+    }
+    .file-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 800; letter-spacing: .04em;
+      flex-shrink: 0;
+    }
+    .file-icon.pdf   { background: rgba(247,111,111,.15); color: var(--red);   }
+    .file-icon.pptx  { background: rgba(245,200,66,.15);  color: var(--yellow);}
+    .file-icon.docx  { background: rgba(79,142,247,.15);  color: var(--accent);}
+    .file-icon.zip   { background: rgba(34,211,165,.15);  color: var(--green); }
+
+    .card-meta { flex: 1; min-width: 0; }
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem; font-weight: 700;
+      color: var(--text); line-height: 1.3;
+      margin-bottom: .25rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .card-subject {
+      font-size: .78rem; color: var(--accent);
+      font-weight: 600;
+    }
+
+    .card-badge {
+      font-size: .7rem; font-weight: 700;
+      border-radius: 6px; padding: .25rem .55rem;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .badge-new { background: rgba(34,211,165,.15); color: var(--green); }
+    .badge-popular { background: rgba(245,200,66,.15); color: var(--yellow); }
+
+    .card-desc {
+      font-size: .84rem; color: var(--muted);
+      line-height: 1.5; margin-bottom: 1.1rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-footer {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      padding-top: .9rem; margin-top: auto;
+    }
+    .uploader {
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; flex-shrink: 0;
+    }
+    .uploader-name { font-size: .8rem; color: var(--muted); }
+    .card-actions { display: flex; gap: .5rem; }
+    .action-btn {
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 8px; padding: .4rem .5rem;
+      color: var(--muted); cursor: pointer;
+      transition: all .2s; display: flex; align-items: center; gap: .3rem;
+      font-size: .78rem; font-family: 'DM Sans', sans-serif; font-weight: 500;
+    }
+    .action-btn:hover {
+      border-color: var(--accent); color: var(--accent);
+      background: rgba(79,142,247,.08);
+    }
+    .action-btn svg { width: 14px; height: 14px; }
+    .action-btn.download:hover {
+      border-color: var(--green); color: var(--green);
+      background: rgba(34,211,165,.08);
+    }
+
+    /* ── empty state ── */
+    .empty-state {
+      text-align: center; padding: 5rem 2rem;
+      display: none;
+    }
+    .empty-state.visible { display: block; }
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .empty-state h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem; color: var(--text); margin-bottom: .5rem;
+    }
+    .empty-state p { color: var(--muted); font-size: .9rem; }
+
+    /* ── list view adjustments ── */
+    .resources-grid.list-view .resource-card {
+      display: flex; align-items: center; gap: 1.2rem;
+      padding: 1rem 1.4rem;
+    }
+    .resources-grid.list-view .card-top { margin-bottom: 0; flex: 1; }
+    .resources-grid.list-view .card-desc { display: none; }
+    .resources-grid.list-view .card-footer { border-top: none; padding-top: 0; margin-left: auto; }
+    .resources-grid.list-view .card-badge { display: none; }
+
+    /* ── animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav>
+  <div class="nav-logo">UNI<span>SYNC</span></div>
+  <ul class="nav-links">
+    <li><a href="#">Dashboard</a></li>
+    <li><a href="#" class="active">Resources</a></li>
+    <li><a href="#">Tasks</a></li>
+    <li><a href="#">Groups</a></li>
+  </ul>
+  <a href="upload.html" class="nav-cta">+ Upload</a>
+</nav>
+
+<!-- ── Main ── -->
+<main>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-title-wrap">
+      <p class="page-eyebrow">📚 Resource Library</p>
+      <h1 class="page-title">Shared <span>Resources</span></h1>
+    </div>
+    <a href="upload.html" class="upload-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+      </svg>
+      Upload Material
+    </a>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="stats-row">
+    <div class="stat-chip">
+      <span class="stat-dot" style="background:var(--accent)"></span>
+      <strong id="totalCount">12</strong> total resources
+    </div>
+    <div class="stat-chip">
+      <span class="stat-dot" style="background:var(--green)"></span>
+      <strong>3</strong> added this week
+    </div>
+    <div class="stat-chip">
+      <span class="stat-dot" style="background:var(--yellow)"></span>
+      <strong>5</strong> subjects covered
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input type="text" class="search-input" id="searchInput"
+             placeholder="Search by title or subject…" />
+    </div>
+
+    <select class="filter-select" id="subjectFilter">
+      <option value="">All Subjects</option>
+      <option value="CSE470">CSE470 – Software Engineering</option>
+      <option value="CSE471">CSE471 – Machine Learning</option>
+      <option value="CSE482">CSE482 – Computer Networks</option>
+      <option value="CSE310">CSE310 – Algorithms</option>
+      <option value="MAT215">MAT215 – Discrete Math</option>
+    </select>
+
+    <select class="filter-select" id="typeFilter">
+      <option value="">All Types</option>
+      <option value="pdf">PDF</option>
+      <option value="pptx">PowerPoint</option>
+      <option value="docx">Word Doc</option>
+      <option value="zip">ZIP</option>
+    </select>
+
+    <div class="view-toggle">
+      <button class="view-btn active" id="gridBtn" title="Grid view">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      </button>
+      <button class="view-btn" id="listBtn" title="List view">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Resources Grid -->
+  <div class="resources-grid" id="resourcesGrid">
+    <!-- Cards injected by JS -->
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">🔍</div>
+    <h3>No resources found</h3>
+    <p>Try adjusting your search or filters.</p>
+  </div>
+
+</main>
+
+<script>
+  // ── Sample data (will be replaced by API call in Sprint 2) ──
+  const resources = [
+    {
+      id: 1, title: "Software Engineering Lecture Slides",
+      subject: "CSE470", type: "pptx",
+      desc: "Complete set of lecture slides covering SDLC, Agile, Scrum, and design patterns.",
+      uploader: "Umama S.", initials: "US", date: "Apr 20, 2025",
+      downloads: 34, badge: "popular"
+    },
+    {
+      id: 2, title: "Machine Learning Cheat Sheet",
+      subject: "CSE471", type: "pdf",
+      desc: "Condensed notes on supervised learning, neural networks, and model evaluation metrics.",
+      uploader: "Jarin A.", initials: "JA", date: "Apr 18, 2025",
+      downloads: 21, badge: "new"
+    },
+    {
+      id: 3, title: "Computer Networks Lab Report",
+      subject: "CSE482", type: "docx",
+      desc: "Lab report template and sample for the socket programming assignment.",
+      uploader: "Fariha A.", initials: "FA", date: "Apr 15, 2025",
+      downloads: 12, badge: ""
+    },
+    {
+      id: 4, title: "Algorithms – Dynamic Programming Notes",
+      subject: "CSE310", type: "pdf",
+      desc: "Detailed notes on DP problems: knapsack, LCS, matrix chain multiplication.",
+      uploader: "Mahia T.", initials: "MT", date: "Apr 17, 2025",
+      downloads: 28, badge: "popular"
+    },
+    {
+      id: 5, title: "Discrete Math Formula Sheet",
+      subject: "MAT215", type: "pdf",
+      desc: "One-page reference for logic, sets, combinatorics, and graph theory formulas.",
+      uploader: "Janifa J.", initials: "JJ", date: "Apr 21, 2025",
+      downloads: 9, badge: "new"
+    },
+    {
+      id: 6, title: "SE Project Templates & Resources",
+      subject: "CSE470", type: "zip",
+      desc: "Starter code, ER diagrams, and documentation templates for the group project.",
+      uploader: "Umama S.", initials: "US", date: "Apr 16, 2025",
+      downloads: 41, badge: "popular"
+    },
+    {
+      id: 7, title: "ML Assignment 2 Solution",
+      subject: "CSE471", type: "pdf",
+      desc: "Worked solutions for regression and classification assignment problems.",
+      uploader: "Jarin A.", initials: "JA", date: "Apr 14, 2025",
+      downloads: 18, badge: ""
+    },
+    {
+      id: 8, title: "Network Security Slides",
+      subject: "CSE482", type: "pptx",
+      desc: "Slides covering TLS, firewalls, intrusion detection, and VPN concepts.",
+      uploader: "Fariha A.", initials: "FA", date: "Apr 13, 2025",
+      downloads: 15, badge: ""
+    },
+    {
+      id: 9, title: "Sorting Algorithms Comparison",
+      subject: "CSE310", type: "docx",
+      desc: "Comparison table and analysis of quicksort, mergesort, heapsort time complexities.",
+      uploader: "Mahia T.", initials: "MT", date: "Apr 12, 2025",
+      downloads: 7, badge: ""
+    },
+    {
+      id: 10, title: "Graph Theory Practice Problems",
+      subject: "MAT215", type: "pdf",
+      desc: "50 practice problems with solutions on Euler paths, trees, and planar graphs.",
+      uploader: "Janifa J.", initials: "JJ", date: "Apr 10, 2025",
+      downloads: 11, badge: ""
+    },
+    {
+      id: 11, title: "Agile Sprint Planning Template",
+      subject: "CSE470", type: "docx",
+      desc: "Editable Word template for sprint planning, backlog grooming, and retrospectives.",
+      uploader: "Jarin A.", initials: "JA", date: "Apr 22, 2025",
+      downloads: 5, badge: "new"
+    },
+    {
+      id: 12, title: "CNN Architecture Diagrams",
+      subject: "CSE471", type: "zip",
+      desc: "High-res diagrams of LeNet, AlexNet, VGG, and ResNet architectures for presentations.",
+      uploader: "Umama S.", initials: "US", date: "Apr 9, 2025",
+      downloads: 23, badge: ""
+    }
+  ];
+
+  const typeColors = { pdf: 'pdf', pptx: 'pptx', docx: 'docx', zip: 'zip' };
+
+  function buildCard(r) {
+    const badgeHTML = r.badge
+      ? `<span class="card-badge badge-${r.badge}">${r.badge === 'new' ? '✦ New' : '🔥 Popular'}</span>`
+      : '';
+    return `
+      <div class="resource-card" data-type="${r.type}"
+           data-title="${r.title.toLowerCase()}"
+           data-subject="${r.subject}">
+        <div class="card-top">
+          <div class="file-icon ${typeColors[r.type]}">${r.type.toUpperCase()}</div>
+          <div class="card-meta">
+            <div class="card-title">${r.title}</div>
+            <div class="card-subject">${r.subject}</div>
+          </div>
+          ${badgeHTML}
+        </div>
+        <p class="card-desc">${r.desc}</p>
+        <div class="card-footer">
+          <div class="uploader">
+            <div class="avatar">${r.initials}</div>
+            <span class="uploader-name">${r.uploader} · ${r.date}</span>
+          </div>
+          <div class="card-actions">
+            <button class="action-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              ${r.downloads}
+            </button>
+            <button class="action-btn download"
+              onclick="handleDownload(event, ${r.id}, '${r.title}', '${r.type}')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+              </svg>
+              Download
+            </button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderCards(list) {
+    const grid = document.getElementById('resourcesGrid');
+    const empty = document.getElementById('emptyState');
+    document.getElementById('totalCount').textContent = list.length;
+    if (list.length === 0) {
+      grid.innerHTML = '';
+      empty.classList.add('visible');
+    } else {
+      empty.classList.remove('visible');
+      grid.innerHTML = list.map(buildCard).join('');
+    }
+  }
+
+  function applyFilters() {
+    const q       = document.getElementById('searchInput').value.toLowerCase();
+    const subject = document.getElementById('subjectFilter').value;
+    const type    = document.getElementById('typeFilter').value;
+    const filtered = resources.filter(r => {
+      const matchQ = !q || r.title.toLowerCase().includes(q) || r.subject.toLowerCase().includes(q);
+      const matchS = !subject || r.subject === subject;
+      const matchT = !type    || r.type === type;
+      return matchQ && matchS && matchT;
+    });
+    renderCards(filtered);
+  }
+
+  function handleDownload(e, id, title, type) {
+    e.stopPropagation();
+    // In Sprint 2 this will call: fetch(`/api/resources/${id}/download`)
+    alert(`⬇️ Downloading "${title}.${type}"\n\n(Backend download will be wired up in Sprint 2)`);
+  }
+
+  // View toggle
+  document.getElementById('gridBtn').addEventListener('click', () => {
+    document.getElementById('resourcesGrid').classList.remove('list-view');
+    document.getElementById('gridBtn').classList.add('active');
+    document.getElementById('listBtn').classList.remove('active');
+  });
+  document.getElementById('listBtn').addEventListener('click', () => {
+    document.getElementById('resourcesGrid').classList.add('list-view');
+    document.getElementById('listBtn').classList.add('active');
+    document.getElementById('gridBtn').classList.remove('active');
+  });
+
+  // Live filter listeners
+  document.getElementById('searchInput').addEventListener('input', applyFilters);
+  document.getElementById('subjectFilter').addEventListener('change', applyFilters);
+  document.getElementById('typeFilter').addEventListener('change', applyFilters);
+
+  // Initial render
+  renderCards(resources);
+</script>
+</body>
+</html>
