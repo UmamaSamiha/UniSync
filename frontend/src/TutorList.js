@@ -84,8 +84,13 @@ const TutorList = ({ currentUser }) => {
                     filteredTutors.map(tutor => (
                         <div key={tutor.id} style={cardStyle}>
                             <h3 style={{ color: '#007bff', margin: '0 0 10px 0' }}>{tutor.name}</h3>
-                            <p style={{ marginBottom: '10px' }}><strong>📚 Subject:</strong> {tutor.subject}</p>
-                            {/* RATING REMOVED FROM HERE */}
+                            <p style={{ marginBottom: '5px' }}><strong>📚 Subject:</strong> {tutor.subject}</p>
+                            
+                            {/* --- THE RATING IS BACK --- */}
+                            <p style={{ marginBottom: '10px', color: '#555' }}>
+                                <strong>⭐ Rating:</strong> {tutor.rating} / 5.0
+                            </p>
+                            
                             <p style={{ fontStyle: 'italic', color: '#666', fontSize: '14px', lineHeight: '1.4' }}>
                                 "{tutor.bio}"
                             </p>
