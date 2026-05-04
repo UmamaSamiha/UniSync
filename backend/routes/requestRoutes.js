@@ -1,30 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const { 
-    createRequest, 
-    getTutors, 
-    sendTutorRequest, 
-    getTutorRequests, 
+const {
+    getTutors,
+    sendTutorRequest,   // <--- This is our primary fixed function
+    getTutorRequests,
     updateRequestStatus,
     getStudentRequests,
     registerTutor,
-    loginUser // <--- ADD THIS LINE HERE!
+    loginUser
 } = require('../controllers/requestController');
 
-// Existing Routes
-router.post('/', createRequest);
-router.get('/tutors', getTutors);
-router.post('/send-request', sendTutorRequest);
+// --- Routes ---
 
-// New Dashboard Routes
+// 1. Send a Request (Changed from '/' and createRequest to match your frontend)
+// This is the route triggered by axios.post('http://localhost:5000/api/requests', ...)
+router.post('/', sendTutorRequest);
+
+// 2. Get All Tutors
+router.get('/tutors', getTutors);
+
+// 3. Tutor Dashboard: Get requests for a specific tutor
 router.get('/tutor-dashboard/:tutorId', getTutorRequests);
+
+// 4. Update Status: Accept or Reject
 router.put('/:id/status', updateRequestStatus);
 
-router.get('/student-dashboard/:email', getStudentRequests);
-router.post('/tutors/register', registerTutor);
+// 5. Student Dashboard: Get requests made by a specific student
+router.get('/student/:email', getStudentRequests);
 
-// Login Route
-router.post('/login', loginUser);
-
-// THIS MUST BE THE ABSOLUTE LAST LINE
 module.exports = router;

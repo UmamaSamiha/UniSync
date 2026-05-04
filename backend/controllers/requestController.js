@@ -1,27 +1,30 @@
 const db = require('../db');
 
-const createRequest = async (req, res) => {
-    // 1. Get the data from the frontend
-    const { student_name, student_email, course_code, tutor_id } = req.body;
-
+// Send a tutoring request
+const sendTutorRequest = async (req, res) => {
+    const { student_name, student_email, tutor_id, course_code, topic } = req.body;
+    
     try {
-        // 2. The SQL query must match your phpMyAdmin column names exactly
-        // Based on your screenshot, your columns are: studentName, courseCode, status, tutor_id, student_email
         const query = `
-            INSERT INTO requests (studentName, student_email, courseCode, status, tutor_id) 
-            VALUES (?, ?, ?, 'Pending', ?)
+            INSERT INTO requests (student_name, student_email, tutor_id, course_code, topic, status) 
+            VALUES (?, ?, ?, ?, ?, 'pending')
         `;
-
-        // 3. Pass the variables in the EXACT same order as the question marks
-        await db.execute(query, [student_name, student_email, course_code, tutor_id]);
+        await db.execute(query, [
+            student_name, 
+            student_email, 
+            tutor_id, 
+            course_code, 
+            topic || "General Discussion"
+        ]);
 
         res.status(201).json({ message: "✅ Request sent successfully!" });
     } catch (error) {
         console.error("Database Error:", error);
-        res.status(500).json({ message: "❌ Error saving request to database." });
+        res.status(500).json({ message: "❌ Failed to send request. Check column names." });
     }
 };
 
+// Fetch list of available tutors
 const getTutors = async (req, res) => {
     try {
         const [rows] = await db.execute("SELECT * FROM tutors");
@@ -31,20 +34,7 @@ const getTutors = async (req, res) => {
     }
 };
 
-const sendTutorRequest = async (req, res) => {
-    const { student_name, student_email, tutor_id, course_code } = req.body;
-    
-    try {
-        const query = "INSERT INTO requests (student_name, student_email, tutor_id, course_code, status) VALUES (?, ?, ?, ?, 'pending')";
-        await db.execute(query, [student_name, student_email, tutor_id, course_code]);
-        res.status(201).json({ message: "✅ Request sent successfully!" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "❌ Failed to send request" });
-    }
-};
-
-// Fetch pending requests for a specific tutor
+// Fetch requests sent TO a specific tutor (Tutor View)
 const getTutorRequests = async (req, res) => {
     const tutorId = req.params.tutorId;
     try {
@@ -59,7 +49,7 @@ const getTutorRequests = async (req, res) => {
 // Accept or Reject a request
 const updateRequestStatus = async (req, res) => {
     const requestId = req.params.id;
-    const { status } = req.body; // This will be either 'accepted' or 'rejected'
+    const { status } = req.body; 
     
     try {
         await db.execute("UPDATE requests SET status = ? WHERE id = ?", [status, requestId]);
@@ -70,7 +60,7 @@ const updateRequestStatus = async (req, res) => {
     }
 };
 
-// Fetch all requests made by a specific student
+// Fetch requests made BY a specific student (Student View)
 const getStudentRequests = async (req, res) => {
     const email = req.params.email;
     try {
@@ -85,9 +75,7 @@ const getStudentRequests = async (req, res) => {
 // Register a new tutor
 const registerTutor = async (req, res) => {
     const { name, subject, bio } = req.body;
-    
     try {
-        // We will default their starting rating to 5.0 so they look good on the dashboard!
         await db.execute(
             "INSERT INTO tutors (name, subject, rating, bio) VALUES (?, ?, ?, ?)", 
             [name, subject, 5.0, bio]
@@ -95,10 +83,11 @@ const registerTutor = async (req, res) => {
         res.status(201).json({ message: "✅ Successfully registered as a tutor!" });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "❌ Error registering tutor. Check database columns." });
+        res.status(500).json({ message: "❌ Error registering tutor." });
     }
 };
 
+// Basic Login
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -114,6 +103,11 @@ const loginUser = async (req, res) => {
 };
 
 module.exports = {
-    createRequest, getTutors, sendTutorRequest, getTutorRequests, updateRequestStatus, getStudentRequests, registerTutor, loginUser
+    getTutors, 
+    sendTutorRequest, 
+    getTutorRequests, 
+    updateRequestStatus, 
+    getStudentRequests, 
+    registerTutor, 
+    loginUser
 };
-
