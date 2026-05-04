@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import TutorList from './TutorList';
 import TutorDashboard from './TutorDashboard';
 import StudentDashboard from './StudentDashboard';
-import BecomeTutor from './BecomeTutor';
 
 
 function App() {
@@ -23,8 +22,6 @@ function App() {
             </header>
 
             <main>
-                <BecomeTutor currentUser={user} />
-                <hr />
                 <TutorList currentUser={user} />
                 <hr />
                 <StudentDashboard currentUser={user} />
