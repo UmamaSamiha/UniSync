@@ -1,31 +1,32 @@
 const express = require('express');
 const router = express.Router();
+
 const {
-    getTutors,
-    sendTutorRequest,   // <--- This is our primary fixed function
-    getTutorRequests,
-    updateRequestStatus,
-    getStudentRequests,
-    registerTutor,
+    getTutors, 
+    sendTutorRequest, 
+    getAllRequests, 
+    getTutorRequests, 
+    updateRequestStatus, 
+    getStudentRequests, // 🚨 ADDED THIS BACK IN!
+    registerTutor, 
     loginUser
-} = require('../controllers/requestController');
+} = require('../controllers/requestController'); 
 
-// --- Routes ---
+// --- AUTHENTICATION ---
+router.post('/login', loginUser);
+router.post('/signup', registerTutor); 
 
-// 1. Send a Request (Changed from '/' and createRequest to match your frontend)
-// This is the route triggered by axios.post('http://localhost:5000/api/requests', ...)
-router.post('/', sendTutorRequest);
+// --- GENERAL REQUESTS ---
+router.get('/requests', getAllRequests);       
+router.post('/requests', sendTutorRequest);    
+router.put('/requests/:id', updateRequestStatus); 
 
-// 2. Get All Tutors
-router.get('/tutors', getTutors);
+// --- TUTOR ROUTES ---
+router.get('/requests/tutors', getTutors);
+router.get('/requests/tutor/:tutorId', getTutorRequests);
 
-// 3. Tutor Dashboard: Get requests for a specific tutor
-router.get('/tutor-dashboard/:tutorId', getTutorRequests);
-
-// 4. Update Status: Accept or Reject
-router.put('/:id/status', updateRequestStatus);
-
-// 5. Student Dashboard: Get requests made by a specific student
-router.get('/student/:email', getStudentRequests);
+// --- 🚨 THE NEW STUDENT TUNNEL 🚨 ---
+// Matches what your Student View needs to fetch requests by email
+router.get('/requests/student/:email', getStudentRequests);
 
 module.exports = router;

@@ -1,0 +1,83 @@
+:root {
+    --teal-50:  #effcf9; --teal-100: #d0f7ef; --teal-200: #a3efe0;
+    --teal-300: #6de0cc; --teal-400: #3fc9b4; --teal-500: #22ab99;
+    --teal-600: #178a7e; --teal-700: #166f67;
+    --blue-100: #ddedfb; --blue-200: #c2dff8; --blue-500: #3f8fe3;
+    --slate-400: #94a5b0; --slate-500: #73858f; --slate-600: #5e6f78;
+    --slate-700: #4d5b63; --slate-800: #3a464d; --slate-900: #1e2a30;
+    --bg: #f2faf8; --card: #ffffff; --border: var(--teal-200);
+    --shadow: 0 8px 40px rgba(22,74,70,0.12);
+    --radius: 16px; --radius-sm: 10px;
+}
+
+.login-page-wrapper {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg); color: var(--slate-900);
+    min-height: 80vh; display: flex; align-items: center; justify-content: center;
+    padding: 24px; position: relative; overflow: hidden;
+    border-radius: var(--radius);
+}
+
+.bg-shape { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; pointer-events: none; z-index: 0; }
+.bg-1 { width: 500px; height: 500px; background: var(--teal-200); top: -160px; right: -120px; }
+.bg-2 { width: 400px; height: 400px; background: var(--blue-200); bottom: -100px; left: -100px; }
+
+.login-card {
+    position: relative; z-index: 1;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 44px 40px;
+    box-shadow: var(--shadow); width: 100%; max-width: 420px;
+    animation: rise 0.4s ease;
+}
+@keyframes rise { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+.logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 6px; }
+.logo-icon { color: var(--teal-500); }
+.logo h1 {
+    font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.8rem; margin: 0;
+    background: linear-gradient(135deg, var(--teal-600), var(--blue-500));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.tagline { text-align: center; font-size: 0.85rem; color: var(--slate-500); margin-bottom: 28px; }
+
+.tabs { display: flex; background: var(--teal-50); border-radius: var(--radius-sm); padding: 4px; margin-bottom: 28px; }
+.tab-btn {
+    flex: 1; padding: 9px; border: none; background: transparent;
+    font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600;
+    color: var(--slate-500); border-radius: 8px; cursor: pointer; transition: all 0.2s;
+}
+.tab-btn.active { background: #fff; color: var(--teal-700); box-shadow: 0 2px 8px rgba(22,74,70,0.1); }
+
+.form-group { margin-bottom: 16px; text-align: left; }
+.form-label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--slate-700); margin-bottom: 6px; }
+.form-input {
+    width: 100%; padding: 11px 14px; box-sizing: border-box;
+    border: 1.5px solid var(--teal-200); border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--slate-900);
+    background: #fafffe; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-input:focus { border-color: var(--teal-400); box-shadow: 0 0 0 3px rgba(34,171,153,0.12); }
+
+.btn-submit {
+    width: 100%; padding: 12px; margin-top: 4px;
+    background: linear-gradient(135deg, var(--teal-500), var(--blue-500));
+    color: white; border: none; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; transition: all 0.25s; box-shadow: 0 4px 14px rgba(34,171,153,0.3);
+}
+.btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(34,171,153,0.4); }
+
+.alert {
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    font-size: 0.84rem; font-weight: 500; margin-bottom: 16px;
+}
+.alert.error   { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.alert.success { background: var(--teal-50); color: var(--teal-700); border: 1px solid var(--teal-200); }
+
+.hint {
+    margin-top: 20px; padding: 12px 14px; text-align: left;
+    background: var(--teal-50); border: 1px solid var(--teal-100);
+    border-radius: var(--radius-sm); font-size: 0.78rem; color: var(--slate-600);
+    line-height: 1.6;
+}
+.hint strong { color: var(--teal-700); }

@@ -34,7 +34,19 @@ const getTutors = async (req, res) => {
     }
 };
 
-// Fetch requests sent TO a specific tutor (Tutor View)
+// --- THE FIX: NEW FUNCTION ADDED HERE ---
+// Fetch ALL requests (This allows your React frontend to do the filtering safely)
+const getAllRequests = async (req, res) => {
+    try {
+        const [rows] = await db.execute("SELECT * FROM requests");
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error("Error fetching all requests:", error);
+        res.status(500).json({ message: "❌ Error fetching requests" });
+    }
+};
+
+// Fetch requests sent TO a specific tutor (Kept for future use if needed)
 const getTutorRequests = async (req, res) => {
     const tutorId = req.params.tutorId;
     try {
@@ -60,7 +72,7 @@ const updateRequestStatus = async (req, res) => {
     }
 };
 
-// Fetch requests made BY a specific student (Student View)
+// Fetch requests made BY a specific student
 const getStudentRequests = async (req, res) => {
     const email = req.params.email;
     try {
@@ -102,9 +114,11 @@ const loginUser = async (req, res) => {
     }
 };
 
+// EXPORT THE NEW FUNCTION
 module.exports = {
     getTutors, 
     sendTutorRequest, 
+    getAllRequests, // <--- Exported here
     getTutorRequests, 
     updateRequestStatus, 
     getStudentRequests, 

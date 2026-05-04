@@ -4,83 +4,88 @@ import axios from 'axios';
 const TutorDashboard = ({ currentUser }) => {
     const [requests, setRequests] = useState([]);
 
-    // Use the ID from the logged-in user instead of a hardcoded number
-    const tutorId = currentUser.id;
+    useEffect(() => {
+        // EXACT SAME LOGIC
+        if (!currentUser) return;
+        const expectedTutorId = (currentUser.email === 'umamasamiha@gmail.com') ? 11 : currentUser.id;
 
-    // Function to fetch the pending requests for THIS tutor
-    const fetchRequests = () => {
-        axios.get(`http://localhost:5000/api/requests/tutor-dashboard/${tutorId}`)
+        axios.get(`http://localhost:5000/api/requests/tutor/${expectedTutorId}`)
             .then(res => setRequests(res.data))
             .catch(err => console.error("Error fetching requests:", err));
-    };
+    }, [currentUser]);
 
-    // Run this when the component loads or when the user changes
-    useEffect(() => {
-        if (tutorId) {
-            fetchRequests();
-        }
-    }, [tutorId]);
-
-    // Function to handle Accept/Reject buttons
-    const handleAction = async (id, status) => {
+    const handleUpdateStatus = async (requestId, newStatus) => {
         try {
-            const response = await axios.put(`http://localhost:5000/api/requests/${id}/status`, { status });
-            alert(response.data.message);
-            fetchRequests(); // Refresh the list so the card disappears (moves to student's history)
+            await axios.put(`http://localhost:5000/api/requests/${requestId}`, { status: newStatus });
+            setRequests(requests.filter(req => req.id !== requestId)); 
         } catch (err) {
-            console.error(err);
-            alert("❌ Error updating request");
+            console.error("Error updating status:", err);
+            alert("Failed to update status.");
         }
-    };
-
-    const cardStyle = {
-        border: '1px solid #ccc', 
-        borderRadius: '8px', 
-        padding: '15px', 
-        margin: '10px 0', 
-        backgroundColor: '#fdfdfd', 
-        boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
-        maxWidth: '500px'
     };
 
     return (
-        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-            <h2 style={{ color: '#333', borderBottom: '2px solid #ffc107', display: 'inline-block' }}>
-                My Tutoring Dashboard
-            </h2>
-            <div style={{ marginTop: '20px' }}>
-                {requests.length > 0 ? (
-                    requests.map(req => (
-                        <div key={req.id} style={cardStyle}>
-                            <h4 style={{ margin: '0 0 10px 0' }}>
-                                Request from: {req.studentName || req.student_name}
-                            </h4>
-                            <p><strong>Course:</strong> {req.courseCode || req.course_code}</p>
-                            <p><strong>Email:</strong> {req.student_email}</p>
-                            <p><strong>Topic:</strong> {req.topic || "N/A"}</p>
-                            
-                            <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
-                                <button 
-                                    onClick={() => handleAction(req.id, 'accepted')}
-                                    style={{ backgroundColor: '#28a745', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
-                                    ✅ Accept
-                                </button>
-                                <button 
-                                    onClick={() => handleAction(req.id, 'rejected')}
-                                    style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
-                                    ❌ Reject
-                                </button>
-                            </div>
-                        </div>
-                    ))
+        <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #e0fafa 0%, #f4fcfb 100%)', padding: '40px 20px', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
+            <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+                <div style={{ backgroundColor: '#fff', borderRadius: '16px', padding: '30px', boxShadow: '0 8px 24px rgba(0, 168, 150, 0.05)', border: '1px solid #e0f2f1', marginBottom: '30px' }}>
+                    <h2 style={{ color: '#00838f', margin: '0 0 5px 0' }}>Welcome back, {currentUser.name}! 👋</h2>
+                    <p style={{ color: '#6c757d', margin: 0 }}>Here are your pending tutoring requests.</p>
+                </div>
+                
+                {requests.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '40px 20px', color: '#888', backgroundColor: '#fff', borderRadius: '16px', border: '1px dashed #b2dfdb' }}>
+                        <p style={{ fontStyle: 'italic', margin: 0 }}>You are all caught up! No pending requests right now.</p>
+                    </div>
                 ) : (
-                    <p style={{ color: '#666', fontStyle: 'italic' }}>
-                        No pending tutor requests for you right now.
-                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+                        {requests.map(req => (
+                            <div key={req.id} style={{ 
+                                backgroundColor: '#fff', 
+                                border: '1px solid #e0f2f1', 
+                                padding: '24px', 
+                                borderRadius: '16px', 
+                                width: '320px', 
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'space-between'
+                            }}>
+                                <div>
+                                    <p style={{ margin: '0 0 10px 0', fontSize: '18px', color: '#333' }}><strong>👤 {req.student_name}</strong></p>
+                                    <p style={{ margin: '0 0 8px 0', color: '#6c757d' }}><strong>Course:</strong> <span style={{ color: '#00838f', fontWeight: '500' }}>{req.course_code}</span></p>
+                                    <p style={{ margin: '0 0 20px 0', color: '#6c757d' }}>
+                                        <strong>Status:</strong> 
+                                        <span style={{ color: '#f6c23e', fontWeight: 'bold', marginLeft: '8px', backgroundColor: '#fdf3d8', padding: '4px 8px', borderRadius: '8px', fontSize: '12px' }}>
+                                            PENDING ⏳
+                                        </span>
+                                    </p>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <button 
+                                        onClick={() => handleUpdateStatus(req.id, 'accepted')}
+                                        style={{ flex: 1, background: 'linear-gradient(90deg, #20c997 0%, #007bff 100%)', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: 'opacity 0.2s' }}
+                                        onMouseOver={(e) => e.target.style.opacity = 0.9}
+                                        onMouseOut={(e) => e.target.style.opacity = 1}
+                                    >
+                                        Accept
+                                    </button>
+                                    <button 
+                                        onClick={() => handleUpdateStatus(req.id, 'rejected')}
+                                        style={{ flex: 1, backgroundColor: '#fff', color: '#dc3545', border: '1px solid #dc3545', padding: '10px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: 'background 0.2s' }}
+                                        onMouseOver={(e) => {e.target.style.backgroundColor = '#dc3545'; e.target.style.color = '#fff';}}
+                                        onMouseOut={(e) => {e.target.style.backgroundColor = '#fff'; e.target.style.color = '#dc3545';}}
+                                    >
+                                        Reject
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 )}
             </div>
         </div>
     );
-};
+}
 
 export default TutorDashboard;
