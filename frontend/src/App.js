@@ -3,15 +3,16 @@ import TutorList from './TutorList';
 import TutorDashboard from './TutorDashboard';
 import StudentDashboard from './StudentDashboard';
 import BecomeTutor from './BecomeTutor';
-import Login from './Login';
+
 
 function App() {
-    const [user, setUser] = useState(null);
 
-    // 1. Logic Gate: Show login if no user is found
-    if (!user) {
-        return <Login onLoginSuccess={(userData) => setUser(userData)} />;
-    }
+    const [user, setUser] = useState({ 
+    id: 1, 
+    email: 'student@test.com', 
+    role: 'student' 
+});
+
 
     // 2. The Main App: Only accessible after login
     return (
