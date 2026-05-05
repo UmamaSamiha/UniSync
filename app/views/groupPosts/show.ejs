@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= post.title %> | UniSync</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="top-nav">
+    <div class="nav-brand">✦ UniSync</div>
+    <a href="/study-groups/<%= group.id %>" class="btn btn-secondary">← Back to Group</a>
+  </div>
+
+  <div class="container">
+    <div class="form-card">
+      <div class="post-detail-header">
+        <div class="post-type <%= post.type %>">
+          <%= post.type === 'task' ? '📋 TASK' :
+              post.type === 'discussion' ? '💬 DISCUSSION' :
+              post.type === 'bigbrain' ? '🧠 BIG BRAIN' : '💀 BRAINROT' %>
+        </div>
+        <% if (post.type === 'task') { %>
+          <div class="status-badge status-<%= post.status %>">
+            <%= post.status === 'pending' ? '🕐 Pending' :
+                post.status === 'in_progress' ? '⚡ In Progress' : '✅ Done' %>
+          </div>
+        <% } %>
+      </div>
+
+      <h1 style="font-family:'Sora',sans-serif; font-size:24px; font-weight:800; margin:16px 0 8px;"><%= post.title %></h1>
+      <p class="post-content"><%= post.content %></p>
+
+      <div class="post-meta">
+        <span>✍️ Posted by <strong><%= post.posted_by %></strong></span>
+        <% if (post.assigned_to) { %><span>👤 Assigned to <strong><%= post.assigned_to %></strong></span><% } %>
+        <% if (post.due_date) { %><span>📅 Due: <strong><%= new Date(post.due_date).toDateString() %></strong></span><% } %>
+      </div>
+
+      <% if (post.type === 'task') { %>
+        <div class="status-section">
+          <h3>🔄 Update Task Status</h3>
+          <form action="/study-groups/<%= group.id %>/posts/<%= post.id %>/status" method="POST">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Your Name <span class="req">★</span></label>
+                <select name="updated_by" required>
+                  <option value="">— Select Member —</option>
+                  <% members.forEach(member => { %>
+                    <option value="<%= member.student_name %>"><%= member.student_name %></option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>New Status <span class="req">★</span></label>
+                <select name="new_status" required>
+                  <option value="pending">🕐 Pending</option>
+                  <option value="in_progress">⚡ In Progress</option>
+                  <option value="done">✅ Done</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Note (optional)</label>
+              <textarea name="note" rows="2" placeholder="Add a progress note..."></textarea>
+            </div>
+            <button type="submit" class="btn">Update Status</button>
+          </form>
+        </div>
+
+        <% if (updates.length > 0) { %>
+          <div class="update-history">
+            <h3>📜 Status History</h3>
+            <% updates.forEach(update => { %>
+              <div class="update-item">
+                <div class="update-dot"></div>
+                <div class="update-content">
+                  <strong><%= update.updated_by %></strong> changed
+                  <span class="status-badge status-<%= update.old_status %>"><%= update.old_status %></span>
+                  → <span class="status-badge status-<%= update.new_status %>"><%= update.new_status %></span>
+                  <% if (update.note) { %><p class="update-note">"<%= update.note %>"</p><% } %>
+                  <small><%= new Date(update.updated_at).toLocaleString() %></small>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

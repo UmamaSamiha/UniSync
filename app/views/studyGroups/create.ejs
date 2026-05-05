@@ -1,43 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Create Study Group | UniSync</title>
-    <link rel="stylesheet" href="/css/style.css" />
+  <meta charset="UTF-8" />
+  <title>Create Group | UniSync</title>
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-    <div class="container">
+  <div class="top-nav">
+    <div class="nav-brand">✦ UniSync</div>
+    <a href="/study-groups" class="btn btn-secondary">← Back</a>
+  </div>
+
+  <div class="container">
+    <div class="form-card">
+      <div class="form-title">
         <h1>Create a Study Group</h1>
-        
-        <% if (error) { %>
-            <p class="error"><%= error %></p>
-        <% } %>
+        <p>Start something great — invite your classmates to join you.</p>
+      </div>
 
-        <form action="/study-groups" method="POST">
-            <div class="form-group">
-                <label for="name">Group Name *</label>
-                <input type="text" id="name" name="name" placeholder="e.g. Data Structures Study Squad" required />
-            </div>
+      <% if (error) { %>
+        <p class="error">⚠️ <%= error %></p>
+      <% } %>
 
-            <div class="form-group">
-                <label for="subject">Subject *</label>
-                <input type="text" id="subject" name="subject" placeholder="e.g. Computer Science" required />
-            </div>
-            
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description" name="description" rows="4"
-                placeholder="What will this group focus on?"></textarea>
-            </div>
+      <form action="/study-groups" method="POST">
+        <div class="form-group">
+          <label>Group Name <span class="req">★</span></label>
+          <input type="text" name="name" placeholder="e.g. Software Engineering Study Squad" required />
+        </div>
 
-            <div class="form-group">
-                <label for="created_by">Your Name *</label>
-                <input type="text" id="created_by" name="created_by" placeholder="e.g. Kim Namjoon" required />
-            </div>
-            
-            <button type="submit" class="btn">Create Group</button>
-            <a href="/study-groups" class="btn btn-secondary">Cancel</a>
-        </form>
+        <div class="form-group">
+          <label>Subject <span class="req">★</span></label>
+          <input type="text" name="subject" placeholder="e.g. Computer Science" required />
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea name="description" rows="4" placeholder="What will this group focus on?"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Your Name <span class="req">★</span></label>
+          <input type="text" name="created_by" placeholder="e.g. Kim Seokjin" required />
+        </div>
+
+        <button type="submit" class="btn btn-full">🚀 Create Group</button>
+      </form>
     </div>
+  </div>
 </body>
 </html>

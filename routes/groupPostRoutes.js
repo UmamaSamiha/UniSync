@@ -4,5 +4,7 @@ const groupPostController = require('../app/controllers/groupPostController');
 
 router.get('/posts/create', groupPostController.showCreateForm);
 router.post('/posts', groupPostController.create);
+router.get('/posts/:postId', groupPostController.show);
+router.post('/posts/:postId/status', groupPostController.updateStatus);
 
 module.exports = router;

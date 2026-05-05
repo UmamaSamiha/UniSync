@@ -6,16 +6,17 @@
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-  <div class="container">
-    <a href="/study-groups" class="btn btn-secondary">← Back to Groups</a>
+  <div class="top-nav">
+    <div class="nav-brand">✦ UniSync</div>
+    <a href="/study-groups" class="btn btn-secondary">← All Groups</a>
+  </div>
 
+  <div class="container">
     <div class="group-header">
-      <div>
-        <h1><%= group.name %></h1>
-        <span class="badge"><%= group.subject %></span>
-        <p><%= group.description || 'No description provided.' %></p>
-        <small>Created by <strong><%= group.created_by %></strong></small>
-      </div>
+      <span class="badge"><%= group.subject %></span>
+      <h1><%= group.name %></h1>
+      <p><%= group.description || 'No description provided.' %></p>
+      <small>Created by <strong><%= group.created_by %></strong></small>
     </div>
 
     <div class="two-col">
@@ -23,10 +24,11 @@
       <div class="section">
         <div class="section-header">
           <h2>👥 Members (<%= members.length %>)</h2>
-          <a href="/study-groups/<%= group.id %>/join" class="btn">+ Join</a>
+          <a href="/study-groups/<%= group.id %>/join" class="btn btn-sm">+ Join</a>
         </div>
+
         <% if (members.length === 0) { %>
-          <p class="empty">No members yet!</p>
+          <p class="empty">No members yet — be the first!</p>
         <% } else { %>
           <% members.forEach(member => { %>
             <div class="member-card">
@@ -48,22 +50,37 @@
       <div class="section">
         <div class="section-header">
           <h2>📝 Posts (<%= posts.length %>)</h2>
-          <a href="/study-groups/<%= group.id %>/posts/create" class="btn">+ Post</a>
+          <a href="/study-groups/<%= group.id %>/posts/create" class="btn btn-sm">+ Post</a>
         </div>
+
         <% if (posts.length === 0) { %>
-          <p class="empty">No posts yet. Start something!</p>
+          <p class="empty">Nothing here yet — start a discussion!</p>
         <% } else { %>
           <% posts.forEach(post => { %>
-            <div class="post-card">
-              <div class="post-type <%= post.type %>">
-                <%= post.type === 'task' ? '📋 TASK' :
-                    post.type === 'discussion' ? '💬 DISCUSSION' :
-                    post.type === 'bigbrain' ? '🧠 BIG BRAIN' : '💀 BRAINROT' %>
+            <a href="/study-groups/<%= group.id %>/posts/<%= post.id %>" class="post-link">
+              <div class="post-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                  <div class="post-type <%= post.type %>">
+                    <%= post.type === 'task' ? '📋 TASK' :
+                        post.type === 'discussion' ? '💬 DISCUSSION' :
+                        post.type === 'bigbrain' ? '🧠 BIG BRAIN' : '💀 BRAINROT' %>
+                  </div>
+                  <% if (post.type === 'task') { %>
+                    <div class="status-badge status-<%= post.status %>">
+                      <%= post.status === 'pending' ? '🕐 Pending' :
+                          post.status === 'in_progress' ? '⚡ In Progress' : '✅ Done' %>
+                    </div>
+                  <% } %>
+                </div>
+                <h3><%= post.title %></h3>
+                <p><%= post.content.length > 100 ? post.content.substring(0, 100) + '...' : post.content %></p>
+                <div class="post-footer">
+                  <small>✍️ <strong><%= post.posted_by %></strong></small>
+                  <% if (post.assigned_to) { %><small>👤 <%= post.assigned_to %></small><% } %>
+                  <% if (post.due_date) { %><small>📅 <%= new Date(post.due_date).toDateString() %></small><% } %>
+                </div>
               </div>
-              <h3><%= post.title %></h3>
-              <p><%= post.content %></p>
-              <small>Posted by <strong><%= post.posted_by %></strong></small>
-            </div>
+            </a>
           <% }) %>
         <% } %>
       </div>

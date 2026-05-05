@@ -1,33 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Study Groups | UniSync</title>
-    <link rel="stylesheet" href="/css/style.css" />
+  <meta charset="UTF-8" />
+  <title>UniSync | Study Groups</title>
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-    <div class="container">
-        <div class="header-row">
-            <h1>Study Groups</h1>
-            <a href="/study-groups/create" class="btn">+ Create Group</a>
-        </div>
+  <div class="top-nav">
+    <div class="nav-brand">✦ UniSync</div>
+    <a href="/study-groups/create" class="btn">+ New Group</a>
+  </div>
 
-        <% if (groups.length === 0) { %>
-            <p class="empty">No study groups yet. Be the first to create one!</p>
-        <% } else { %>
-            <div class="card-grid">
-                <% groups.forEach(group => { %>
-                    <div class="card">
-                        <h2><%= group.name %></h2>
-                        <span class="badge"><%= group.subject %></span>
-                        <p><%= group.description || 'No description provided.' %></p>
-                        <small>Created by <strong><%= group.created_by %></strong></small>
-                        <br><br>
-                        <a href="/study-groups/<%= group.id %>" class="btn">View Group →</a>
-                    </div>
-                <% }) %>
-            </div>
-        <% } %>
+  <div class="container">
+    <div class="hero">
+      <h1>Study Together,<br/>Go Further ✦</h1>
+      <p>Find your people. Join a group. Make learning effortless.</p>
     </div>
+
+    <% if (groups.length === 0) { %>
+      <div class="empty-state">
+        <span class="empty-icon">🌌</span>
+        <h2>No study groups yet</h2>
+        <p>The universe is waiting — be the first to create one!</p>
+        <a href="/study-groups/create" class="btn">+ Create Group</a>
+      </div>
+    <% } else { %>
+      <div class="card-grid">
+        <% groups.forEach(group => { %>
+          <div class="card">
+            <div class="card-top">
+              <span class="badge"><%= group.subject %></span>
+            </div>
+            <h2><%= group.name %></h2>
+            <p><%= group.description || 'No description provided.' %></p>
+            <div class="card-footer">
+              <small>👤 <%= group.created_by %></small>
+              <a href="/study-groups/<%= group.id %>" class="btn btn-sm">Open →</a>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
 </body>
 </html>

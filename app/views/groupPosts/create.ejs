@@ -6,13 +6,16 @@
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-  <div class="container">
+  <div class="top-nav">
+    <div class="nav-brand">✦ UniSync</div>
     <a href="/study-groups/<%= group.id %>" class="btn btn-secondary">← Back</a>
+  </div>
 
+  <div class="container">
     <div class="form-card">
       <div class="form-title">
         <h1>Create a Post</h1>
-        <p>Posting in <strong><%= group.name %></strong></p>
+        <p>Posting in <strong style="color:var(--primary)"><%= group.name %></strong></p>
       </div>
 
       <% if (error) { %>
@@ -20,45 +23,44 @@
       <% } %>
 
       <form action="/study-groups/<%= group.id %>/posts" method="POST">
-
         <div class="form-group">
           <label>Your Name <span class="req">★</span></label>
-          <input type="text" name="posted_by" placeholder="e.g. Jung Hoseok" required />
+          <input type="text" name="posted_by" placeholder="e.g. Mahia Tanzin" required />
         </div>
 
         <div class="form-group">
           <label>Post Type <span class="req">★</span></label>
           <div class="type-grid">
             <label class="type-option">
-              <input type="radio" name="type" value="task" required />
+              <input type="radio" name="type" value="task" required onchange="toggleTaskFields(this.value)" />
               <div class="type-card">
                 <span class="type-icon">📋</span>
                 <span class="type-label">Study Task</span>
-                <span class="type-desc">Assign or share a study task</span>
+                <span class="type-desc">Assign a task</span>
               </div>
             </label>
             <label class="type-option">
-              <input type="radio" name="type" value="discussion" />
+              <input type="radio" name="type" value="discussion" onchange="toggleTaskFields(this.value)" />
               <div class="type-card">
                 <span class="type-icon">💬</span>
                 <span class="type-label">Discussion</span>
-                <span class="type-desc">Start a study discussion</span>
+                <span class="type-desc">Start a topic</span>
               </div>
             </label>
             <label class="type-option">
-              <input type="radio" name="type" value="bigbrain" />
+              <input type="radio" name="type" value="bigbrain" onchange="toggleTaskFields(this.value)" />
               <div class="type-card">
                 <span class="type-icon">🧠</span>
                 <span class="type-label">Big Brain</span>
-                <span class="type-desc">Share a big brain moment</span>
+                <span class="type-desc">Galaxy-brained idea</span>
               </div>
             </label>
             <label class="type-option">
-              <input type="radio" name="type" value="brainrot" />
+              <input type="radio" name="type" value="brainrot" onchange="toggleTaskFields(this.value)" />
               <div class="type-card">
                 <span class="type-icon">💀</span>
                 <span class="type-label">Brainrot</span>
-                <span class="type-desc">Just vibing, no thoughts</span>
+                <span class="type-desc">Just vibing fr</span>
               </div>
             </label>
           </div>
@@ -71,13 +73,38 @@
 
         <div class="form-group">
           <label>Content <span class="req">★</span></label>
-          <textarea name="content" rows="5"
-            placeholder="Write your post here..." required></textarea>
+          <textarea name="content" rows="5" placeholder="Write your post here..." required></textarea>
+        </div>
+
+        <div id="task-fields" style="display:none;">
+          <div class="form-section-title">📌 Task Assignment</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Assign To</label>
+              <select name="assigned_to">
+                <option value="">— Unassigned —</option>
+                <% members.forEach(member => { %>
+                  <option value="<%= member.student_name %>"><%= member.student_name %> (<%= member.major %>)</option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Due Date</label>
+              <input type="date" name="due_date" />
+            </div>
+          </div>
         </div>
 
         <button type="submit" class="btn btn-full">✨ Post It</button>
       </form>
     </div>
   </div>
+
+  <script>
+    function toggleTaskFields(type) {
+      document.getElementById('task-fields').style.display =
+        type === 'task' ? 'block' : 'none';
+    }
+  </script>
 </body>
 </html>
