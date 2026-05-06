@@ -10,16 +10,17 @@ const SIDEBAR_W = 240;
 
 function App() {
     const [currentUser, setCurrentUser] = useState(null);
-    const [section, setSection]         = useState('tutoring');
+    const [section, setSection]         = useState('profile');
 
     const handleLogin  = (user) => { setCurrentUser(user); };
-    const handleLogout = ()     => { setCurrentUser(null); setSection('tutoring'); };
+    const handleLogout = ()     => { setCurrentUser(null); setSection('profile'); };
 
     if (!currentUser) return <Login onLogin={handleLogin} />;
 
     const initials = currentUser.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
     const navItems = [
+        { key: 'profile',    icon: '👤', label: 'Profile'       },
         { key: 'tutoring',   icon: '🎓', label: 'Peer Tutoring' },
         { key: 'studytasks', icon: '📚', label: 'Task Tracker'  },
     ];
@@ -79,12 +80,39 @@ function App() {
             <div style={{ marginLeft: SIDEBAR_W, flex: 1, minHeight: '100vh', overflowY: 'auto' }}>
                 <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '40px 28px 80px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-                    {/* Welcome */}
-                    <div>
-                        <h1 style={{ color: '#00838f', fontSize: '28px', margin: '0 0 4px 0' }}>Welcome, {currentUser.name}! 👋</h1>
-                        <p style={{ color: '#6c757d', margin: 0, fontSize: '15px' }}>Ready for your study sessions?</p>
-                    </div>
+                    {/* ── PROFILE ── */}
+                    {section === 'profile' && (
+                        <div>
+                            {/* Hero banner */}
+                            <div style={{ background: 'linear-gradient(135deg, #22ab99, #3f8fe3)', borderRadius: '16px', padding: '36px 32px', display: 'flex', alignItems: 'center', gap: '24px', marginBottom: '24px', color: '#fff' }}>
+                                <div style={{ width: '80px', height: '80px', borderRadius: '50%', flexShrink: 0, background: 'rgba(255,255,255,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', fontWeight: 700, border: '3px solid rgba(255,255,255,0.4)' }}>{initials}</div>
+                                <div>
+                                    <h1 style={{ margin: '0 0 4px 0', fontSize: '1.8rem', fontWeight: 700 }}>Welcome, {currentUser.name}! 👋</h1>
+                                    <p style={{ margin: '0 0 12px 0', opacity: 0.85, fontSize: '0.95rem' }}>{currentUser.email}</p>
+                                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '20px', padding: '3px 14px', fontSize: '0.78rem', fontWeight: 600 }}>
+                                        ⭐ UniSync {currentUser.role === 'tutor' ? 'Tutor' : 'Student'}
+                                    </span>
+                                </div>
+                            </div>
 
+                            {/* Info card */}
+                            <div style={{ background: '#fff', border: '1px solid #d0f7ef', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 16px rgba(0,168,150,0.06)' }}>
+                                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#3a464d', marginBottom: '16px' }}>Account Details</div>
+                                {[
+                                    ['Full Name', currentUser.name],
+                                    ['Email',     currentUser.email],
+                                    ['Role',      currentUser.role === 'tutor' ? '📖 Tutor' : '🎓 Student'],
+                                ].map(([key, val]) => (
+                                    <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #f0fdf9' }}>
+                                        <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#73858f' }}>{key}</span>
+                                        <span style={{ fontSize: '0.88rem', fontWeight: 500, color: '#3a464d' }}>{val}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ── PEER TUTORING ── */}
                     {section === 'tutoring' && (
                         <>
                             {currentUser.role === 'student' ? <StudentDashboard currentUser={currentUser} /> : <TutorDashboard currentUser={currentUser} />}
@@ -92,6 +120,7 @@ function App() {
                         </>
                     )}
 
+                    {/* ── TASK TRACKER ── */}
                     {section === 'studytasks' && (
                         <StudyTasks currentUser={currentUser} />
                     )}

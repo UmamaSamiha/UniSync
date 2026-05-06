@@ -28,7 +28,10 @@ const TutorDashboard = ({ currentUser }) => {
     return (
         <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #e0fafa 0%, #f4fcfb 100%)', padding: '40px 20px', fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
             <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-               
+                <div style={{ backgroundColor: '#fff', borderRadius: '16px', padding: '30px', boxShadow: '0 8px 24px rgba(0, 168, 150, 0.05)', border: '1px solid #e0f2f1', marginBottom: '30px' }}>
+                    <h2 style={{ color: '#00838f', margin: '0 0 5px 0' }}>Pending Tutoring Requests</h2>
+                    <p style={{ color: '#6c757d', margin: 0 }}>Review and respond to session requests from students.</p>
+                </div>
                 
                 {requests.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '40px 20px', color: '#888', backgroundColor: '#fff', borderRadius: '16px', border: '1px dashed #b2dfdb' }}>

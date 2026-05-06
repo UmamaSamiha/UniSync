@@ -4,9 +4,10 @@ import './Login.css';
 
 function Login({ onLogin }) {
     const [activeTab, setActiveTab] = useState('login');
-    const [email, setEmail] = useState('umamasamiha@gmail.com');
-    const [password, setPassword] = useState('12345678');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [name, setName] = useState('');
+    const [role, setRole] = useState('student');
     const [alert, setAlert] = useState({ message: '', type: '' });
 
     // --- HYBRID LOGIN LOGIC ---
@@ -42,12 +43,13 @@ function Login({ onLogin }) {
     const handleSignup = async (e) => {
         e.preventDefault();
         try {
-            const newUser = { name, email, password, role: 'student' }; // Defaulting new signups to student
+            const newUser = { name, email, password, role };
             await axios.post('http://localhost:5000/api/signup', newUser);
             setAlert({ message: 'Account created successfully! You can now log in.', type: 'success' });
             setActiveTab('login'); // Switch back to login tab after success
         } catch (err) {
-            setAlert({ message: 'Signup failed. Email may already be in use.', type: 'error' });
+            const msg = err.response?.data?.error || 'Signup failed. Please try again.';
+            setAlert({ message: msg, type: 'error' });
         }
     };
 
@@ -140,12 +142,33 @@ function Login({ onLogin }) {
                         </div>
                         <div className="form-group">
                             <label className="form-label">Password</label>
-                            <input 
-                                className="form-input" 
-                                type="password" 
+                            <input
+                                className="form-input"
+                                type="password"
                                 onChange={(e) => setPassword(e.target.value)}
-                                required 
+                                required
                             />
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">I am a...</label>
+                            <div style={{ display: 'flex', gap: '12px', marginTop: '6px' }}>
+                                {['student', 'tutor'].map(r => (
+                                    <div
+                                        key={r}
+                                        onClick={() => setRole(r)}
+                                        style={{
+                                            flex: 1, padding: '12px', borderRadius: '10px', cursor: 'pointer',
+                                            border: `2px solid ${role === r ? '#00838f' : '#d0f7ef'}`,
+                                            background: role === r ? '#effcf9' : '#fff',
+                                            textAlign: 'center', fontWeight: 600,
+                                            color: role === r ? '#00838f' : '#888',
+                                            transition: 'all 0.2s',
+                                        }}
+                                    >
+                                        {r === 'student' ? '🎓 Student' : '📖 Tutor'}
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                         <button type="submit" className="btn-submit">Create Account</button>
                     </form>
