@@ -37,7 +37,7 @@ const TutorList = ({ currentUser }) => {
 
     const filteredTutors = tutors.filter(tutor => {
         const isNotMe = currentUser && tutor.id !== currentUser.id;
-        const matchesSearch = tutor.subject.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesSearch = searchTerm.trim() === "" || tutor.subject.toLowerCase().includes(searchTerm.toLowerCase());
         return isNotMe && matchesSearch;
     });
 
@@ -68,9 +68,7 @@ const TutorList = ({ currentUser }) => {
                 </div>
 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-                    {searchTerm.trim() === "" ? (
-                        <p style={{ color: '#888', fontStyle: 'italic' }}>Please enter a course code to see available tutors.</p>
-                    ) : filteredTutors.length > 0 ? (
+                    {filteredTutors.length > 0 ? (
                         filteredTutors.map(tutor => (
                             <div key={tutor.id} style={{ 
                                 backgroundColor: '#fff', 
@@ -101,7 +99,9 @@ const TutorList = ({ currentUser }) => {
                             </div>
                         ))
                     ) : (
-                        <p style={{ color: '#dc3545' }}>No tutors found for "{searchTerm}".</p>
+                        <p style={{ color: '#888', fontStyle: 'italic' }}>
+                            {searchTerm.trim() ? `No tutors found for "${searchTerm}".` : 'No tutors available yet.'}
+                        </p>
                     )}
                 </div>
             </div>
