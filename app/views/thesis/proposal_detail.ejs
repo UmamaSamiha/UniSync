@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Proposal Detail | UniSync</title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+    <div class="container">
+        <a href="javascript:history.back()" class="btn btn-secondary btn-sm back-btn">← Back</a>
+
+        <h1>Thesis Proposal Review</h1>
+
+        <% if (error) { %>
+            <p class="error"><%= error %></p>
+        <% } %>
+
+        <% if (!proposal) { %>
+            <p class="error">Proposal not found.</p>
+        <% } else { %>
+
+        <!-- Proposal Info Card -->
+        <div class="proposal-card">
+            <div class="proposal-header">
+                <h2><%= proposal.title %></h2>
+                <span class="status-badge status-<%= proposal.status %>">
+                    <%= proposal.status.charAt(0).toUpperCase() + proposal.status.slice(1) %>
+                </span>
+            </div>
+
+            <div class="proposal-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Student</span>
+                    <span><%= proposal.student_name || 'N/A' %></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Email</span>
+                    <span><%= proposal.student_email || 'N/A' %></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Faculty</span>
+                    <span><%= proposal.faculty_name || 'N/A' %></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Subject Area</span>
+                    <span><%= proposal.subject_area %></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Submitted</span>
+                    <span><%= new Date(proposal.submitted_at).toLocaleString() %></span>
+                </div>
+                <% if (proposal.reviewed_at) { %>
+                <div class="meta-item">
+                    <span class="meta-label">Reviewed</span>
+                    <span><%= new Date(proposal.reviewed_at).toLocaleString() %></span>
+                </div>
+                <% } %>
+            </div>
+
+            <div class="proposal-description">
+                <h3>Description</h3>
+                <p><%= proposal.description %></p>
+            </div>
+
+            <% if (proposal.faculty_note) { %>
+            <div class="faculty-note">
+                <h3>Faculty Note</h3>
+                <p><%= proposal.faculty_note %></p>
+            </div>
+            <% } %>
+        </div>
+
+        <!-- Review Form — only show if still pending -->
+        <% if (proposal.status === 'pending') { %>
+        <div class="review-form-card">
+            <h2>Make a Decision</h2>
+            <form action="/thesis/proposal/<%= proposal.id %>/review" method="POST">
+                <div class="form-group">
+                    <label for="faculty_note">Note to Student (optional)</label>
+                    <textarea id="faculty_note" name="faculty_note" rows="4"
+                        placeholder="Add a comment or reason for your decision..."></textarea>
+                </div>
+                <div class="decision-buttons">
+                    <button type="submit" name="status" value="accepted" class="btn btn-accept">
+                        ✓ Accept Supervision
+                    </button>
+                    <button type="submit" name="status" value="rejected" class="btn btn-reject">
+                        ✗ Reject Request
+                    </button>
+                </div>
+            </form>
+        </div>
+        <% } else { %>
+            <div class="already-reviewed">
+                <p>This proposal has already been <strong><%= proposal.status %></strong>. No further action needed.</p>
+            </div>
+        <% } %>
+
+        <% } %>
+    </div>
+</body>
+</html>

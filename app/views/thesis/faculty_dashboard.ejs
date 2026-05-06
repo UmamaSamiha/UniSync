@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Faculty Dashboard | UniSync</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+</head>
+<body>
+    <div class="container">
+        <div class="header-row">
+            <h1>Faculty Dashboard</h1>
+        </div>
+
+        <!-- Faculty Selector -->
+        <div class="faculty-selector">
+            <label for="facultyPicker"><strong>Select Faculty Member:</strong></label>
+            <select id="facultyPicker"
+                onchange="if(this.value) window.location='/thesis/faculty/'+this.value">
+                <option value="">-- Choose a faculty --</option>
+                <% facultyList.forEach(f => { %>
+                    <option value="<%= f.id %>"
+                        <%= selectedFaculty && selectedFaculty.id === f.id ? 'selected' : '' %>>
+                        <%= f.name %> — <%= f.department %>
+                    </option>
+                <% }) %>
+            </select>
+        </div>
+
+        <% if (error) { %>
+            <p class="error"><%= error %></p>
+        <% } %>
+
+        <% if (proposals === null) { %>
+            <p class="empty">Please select a faculty member to view their supervision requests.</p>
+
+        <% } else if (proposals.length === 0) { %>
+            <% if (selectedFaculty) { %>
+                <p class="empty">
+                    No thesis proposals found for <strong><%= selectedFaculty.name %></strong>.
+                </p>
+            <% } else { %>
+                <p class="empty">No thesis proposals found.</p>
+            <% } %>
+
+        <% } else { %>
+            <% if (selectedFaculty) { %>
+                <h2 class="section-title">
+                    Supervision Requests for
+                    <span class="highlight"><%= selectedFaculty.name %></span>
+                </h2>
+            <% } else { %>
+                <h2 class="section-title">All Supervision Requests</h2>
+            <% } %>
+
+            <table class="thesis-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Thesis Title</th>
+                        <th>Student</th>
+                        <th>Subject Area</th>
+                        <th>Submitted</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% proposals.forEach((p, i) => { %>
+                        <tr id="row-<%= p.id %>">
+                            <td><%= i + 1 %></td>
+                            <td><strong><%= p.title %></strong></td>
+                            <td>
+                                <%= p.student_name || 'N/A' %>
+                                <% if (p.student_email) { %>
+                                    <br/><small><%= p.student_email %></small>
+                                <% } %>
+                            </td>
+                            <td><%= p.subject_area %></td>
+                            <td><%= new Date(p.submitted_at).toLocaleDateString() %></td>
+                            <td>
+                                <%
+                                  let badgeClass = 'status-pending';
+                                  if (p.status === 'accepted') badgeClass = 'status-accepted';
+                                  if (p.status === 'rejected') badgeClass = 'status-rejected';
+                                %>
+                                <span class="status-badge <%= badgeClass %>">
+                                    <%= p.status.charAt(0).toUpperCase() + p.status.slice(1) %>
+                                </span>
+                            </td>
+                            <td>
+                                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+
+                                    <!-- Review proposal detail -->
+                                    <a href="/thesis/proposal/<%= p.id %>"
+                                       class="btn btn-sm">
+                                        Review
+                                    </a>
+
+                                    <!-- Review uploaded docs — only for accepted -->
+                                    <% if (p.status === 'accepted') { %>
+                                        <a href="/faculty/proposal/<%= p.id %>/docs"
+                                           class="btn btn-sm btn-upload">
+                                            📄 View Docs
+                                        </a>
+                                    <% } %>
+
+                                    <!-- Delete — only for rejected -->
+                                    <% if (p.status === 'rejected') { %>
+                                        <form
+                                            action="/thesis/proposal/<%= p.id %>/delete"
+                                            method="POST"
+                                            onsubmit="return confirmDelete(event, '<%= p.id %>')">
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-reject">
+                                                🗑 Delete
+                                            </button>
+                                        </form>
+                                    <% } %>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } %>
+    </div>
+
+    <script>
+        function confirmDelete(event, proposalId) {
+            const confirmed = confirm(
+                'Delete this rejected proposal? This cannot be undone.'
+            );
+            if (!confirmed) {
+                event.preventDefault();
+                return false;
+            }
+            const row = document.getElementById('row-' + proposalId);
+            if (row) {
+                row.style.transition = 'opacity 0.3s';
+                row.style.opacity = '0';
+                setTimeout(() => row.remove(), 300);
+            }
+            return true;
+        }
+
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) window.location.reload();
+        });
+    </script>
+</body>
+</html>

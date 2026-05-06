@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>My Documents | UniSync</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+</head>
+<body>
+<div class="container">
+
+    <a href="javascript:history.back()" class="btn btn-secondary btn-sm back-btn">← Back</a>
+
+    <div class="header-row">
+        <div>
+            <h1>📁 Thesis Documents</h1>
+            <p class="page-subtitle">
+                Proposal: <strong><%= proposal.title %></strong> —
+                Supervisor: <strong><%= proposal.faculty_name %></strong>
+            </p>
+        </div>
+        <span class="status-badge
+            <%= proposal.status === 'accepted' ? 'status-accepted' :
+               proposal.status === 'rejected' ? 'status-rejected' : 'status-pending' %>">
+            <%= proposal.status.charAt(0).toUpperCase() + proposal.status.slice(1) %>
+        </span>
+    </div>
+
+    <!-- Success / Error alerts -->
+    <% if (success) { %>
+        <div class="alert alert-success">✅ <%= success %></div>
+    <% } %>
+    <% if (error) { %>
+        <div class="alert alert-error">❌ <%= error %></div>
+    <% } %>
+
+    <!-- UPLOAD FORM -->
+    <div class="upload-card" style="margin-bottom: 28px;">
+        <h2 style="margin-bottom:16px; color:#2c3e50;">📤 Upload New Draft</h2>
+        <form action="/student/proposal/<%= proposal.id %>/upload"
+              method="POST"
+              enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Select PDF File *</label>
+                <input type="file" name="file" accept="application/pdf" required
+                       style="padding:8px; border:1px solid #ccc; border-radius:6px; width:100%;" />
+            </div>
+            <button type="submit" class="btn btn-upload">Upload Draft</button>
+        </form>
+    </div>
+
+    <!-- DOCUMENTS LIST WITH FEEDBACK -->
+    <h2 style="margin-bottom:16px; color:#2c3e50;">
+        📄 Uploaded Drafts
+        <span class="feedback-count-badge"><%= documents.length %> file(s)</span>
+    </h2>
+
+    <% if (documents.length === 0) { %>
+        <div class="empty-state">
+            <div class="empty-icon">📂</div>
+            <p>No documents uploaded yet. Upload your first draft above.</p>
+        </div>
+    <% } else { %>
+        <div class="documents-grid">
+            <% documents.forEach(doc => { %>
+
+                <!-- Document Card -->
+                <div class="document-card">
+                    <div class="doc-icon">📄</div>
+                    <div class="doc-info">
+                        <div class="doc-version"><%= doc.version_label %></div>
+                        <div class="doc-filename"><%= doc.original_filename %></div>
+                        <div class="doc-meta">
+                            <span>
+                                Uploaded:
+                                <%= new Date(doc.uploaded_at).toLocaleDateString() %>
+                            </span>
+                            <% if (doc.feedback && doc.feedback.length > 0) { %>
+                                <span class="feedback-count">
+                                    💬 <%= doc.feedback.length %> feedback(s)
+                                </span>
+                            <% } else { %>
+                                <span style="color:#aaa; font-style:italic;">
+                                    No feedback yet
+                                </span>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Thread for this doc -->
+                <% if (doc.feedback && doc.feedback.length > 0) { %>
+                    <div class="feedback-section"
+                         style="margin: -6px 0 16px 0; border-radius:0 0 10px 10px;">
+                        <h3 style="font-size:14px; color:#555; margin-bottom:14px;">
+                            Faculty Feedback for "<%= doc.original_filename %>"
+                        </h3>
+                        <div class="feedback-thread">
+                            <% doc.feedback.forEach(fb => { %>
+                                <div class="feedback-item">
+                                    <div class="feedback-avatar">
+                                        <%= fb.faculty_name
+                                            ? fb.faculty_name.charAt(0).toUpperCase()
+                                            : 'F' %>
+                                    </div>
+                                    <div class="feedback-body">
+                                        <div class="feedback-meta-top">
+                                            <span class="feedback-author">
+                                                <%= fb.faculty_name %>
+                                            </span>
+                                            <span class="feedback-dept">
+                                                <%= fb.department %>
+                                            </span>
+                                            <span class="feedback-time">
+                                                <%= new Date(fb.created_at).toLocaleDateString() %>
+                                            </span>
+                                        </div>
+                                        <div class="feedback-comment"><%= fb.comment %></div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div style="margin: -6px 0 16px 20px; padding: 12px 16px;
+                                background:#f8fafc; border-radius:0 0 8px 8px;
+                                font-size:13px; color:#aaa; font-style:italic;">
+                        Waiting for faculty feedback on this draft...
+                    </div>
+                <% } %>
+
+            <% }) %>
+        </div>
+    <% } %>
+
+</div>
+
+<script>
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) window.location.reload();
+    });
+</script>
+</body>
+</html>

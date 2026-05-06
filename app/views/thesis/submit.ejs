@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Submit Thesis Proposal | UniSync</title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+<div class="container">
+
+    <div class="header-row">
+        <h1>Submit Thesis Proposal</h1>
+        <a href="/thesis/myproposals" class="btn btn-secondary">My Proposals</a>
+    </div>
+
+    <% if (error) { %>
+        <p class="error"><%= error %></p>
+    <% } %>
+    <% if (success) { %>
+        <p class="success"><%= success %></p>
+    <% } %>
+
+    <form action="/thesis/submit" method="POST">
+
+        <h3 style="margin-bottom:16px; color:#555;">Your Details</h3>
+
+        <div class="form-group">
+            <label for="student_name">Full Name *</label>
+            <input type="text" id="student_name" name="student_name"
+                placeholder="e.g. Neha" required />
+        </div>
+
+        <div class="form-group">
+            <label for="student_email">Email *</label>
+            <input type="email" id="student_email" name="student_email"
+                placeholder="e.g. neha@student.edu" required />
+        </div>
+
+        <h3 style="margin: 24px 0 16px; color:#555;">Proposal Details</h3>
+
+        <div class="form-group">
+            <label for="title">Thesis Title *</label>
+            <input type="text" id="title" name="title"
+                placeholder="e.g. AI-Based Traffic Management System" required />
+        </div>
+
+        <div class="form-group">
+            <label for="subject_area">Subject Area *</label>
+            <input type="text" id="subject_area" name="subject_area"
+                placeholder="e.g. Machine Learning" required />
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description *</label>
+            <textarea id="description" name="description" rows="5"
+                placeholder="Describe your thesis topic, research question, and goals..." required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="faculty_id">Select Faculty Supervisor *</label>
+            <select id="faculty_id" name="faculty_id" required>
+                <option value="">-- Choose a faculty member --</option>
+                <% faculty.forEach(f => { %>
+                    <option value="<%= f.id %>">
+                        <%= f.name %> — <%= f.department %>
+                    </option>
+                <% }) %>
+            </select>
+        </div>
+
+        <button type="submit" class="btn">Submit Proposal</button>
+        <a href="/" class="btn btn-secondary">Cancel</a>
+
+    </form>
+</div>
+</body>
+</html>

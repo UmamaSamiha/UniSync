@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>My Proposals | UniSync</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+</head>
+<body>
+<div class="container">
+
+    <div class="header-row">
+        <h1>My Thesis Proposals</h1>
+        <a href="/thesis/submit" class="btn">+ New Proposal</a>
+    </div>
+
+    <!-- Email lookup form -->
+    <form action="/thesis/myproposals" method="GET" style="margin-bottom: 28px;">
+        <div class="form-group" style="display:flex; gap:12px; align-items:flex-end;">
+            <div style="flex:1;">
+                <label>Enter your email to view proposals</label>
+                <input type="email" name="email"
+                    value="<%= email || '' %>"
+                    placeholder="neha@student.edu" required />
+            </div>
+            <button type="submit" class="btn" style="margin-bottom:0;">Search</button>
+        </div>
+    </form>
+
+    <% if (error) { %>
+        <p class="error"><%= error %></p>
+    <% } %>
+
+    <% if (email && !error) { %>
+        <% if (proposals.length === 0) { %>
+            <p class="empty">No proposals found for <strong><%= email %></strong>.</p>
+        <% } else { %>
+            <div class="card-grid">
+                <% proposals.forEach(p => { %>
+                    <div class="card">
+                        <h2><%= p.title %></h2>
+
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+                            <span class="badge"><%= p.subject_area %></span>
+                            <%
+                              let badgeClass = 'status-pending';
+                              if (p.status === 'accepted') badgeClass = 'status-accepted';
+                              if (p.status === 'rejected') badgeClass = 'status-rejected';
+                            %>
+                            <span class="badge <%= badgeClass %>">
+                                <%= p.status.toUpperCase() %>
+                            </span>
+                        </div>
+
+                        <p><%= p.description %></p>
+
+                        <small>
+                            Supervisor: <strong><%= p.faculty_name %></strong>
+                            (<%= p.department %>)
+                        </small><br/>
+
+                        <% if (p.faculty_note) { %>
+                            <div style="margin-top:8px; padding:8px 12px;
+                                        background:#fffbea; border-left:3px solid #f0ad00;
+                                        border-radius:4px; font-size:13px;">
+                                <strong>Faculty Note:</strong> <em><%= p.faculty_note %></em>
+                            </div>
+                        <% } %>
+
+                        <small style="display:block; margin-top:8px;">
+                            Submitted: <%= new Date(p.submitted_at).toLocaleDateString() %>
+                        </small>
+
+                        <!-- Action buttons -->
+                        <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
+                            <% if (p.status === 'accepted') { %>
+                                <!-- Upload & view docs -->
+                                <a href="/student/proposal/<%= p.id %>" class="btn btn-upload"
+                                   style="font-size:13px; padding:8px 14px;">
+                                    📤 Upload / View Docs
+                                </a>
+                            <% } else if (p.status === 'pending') { %>
+                                <span style="font-size:12px; color:#888; font-style:italic;">
+                                    ⏳ Awaiting faculty decision
+                                </span>
+                            <% } else if (p.status === 'rejected') { %>
+                                <span style="font-size:12px; color:#e74c3c; font-style:italic;">
+                                    ❌ Proposal rejected
+                                </span>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+    <% } %>
+
+</div>
+
+<script>
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) window.location.reload();
+    });
+</script>
+</body>
+</html>

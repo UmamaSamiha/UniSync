@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Review Documents | UniSync</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+</head>
+<body>
+<div class="container">
+
+    <a href="javascript:history.back()" class="btn btn-secondary btn-sm back-btn">← Back</a>
+
+    <div class="header-row">
+        <div>
+            <h1>📋 Review Documents</h1>
+            <p class="page-subtitle">
+                Proposal: <strong><%= proposal.title %></strong> —
+                Student: <strong><%= proposal.student_name %></strong>
+                (<%= proposal.student_email %>)
+            </p>
+        </div>
+        <span class="status-badge status-accepted">Accepted</span>
+    </div>
+
+    <% if (success) { %>
+        <div class="alert alert-success">✅ <%= success %></div>
+    <% } %>
+    <% if (error) { %>
+        <div class="alert alert-error">❌ <%= error %></div>
+    <% } %>
+
+    <!-- DOCUMENTS + FEEDBACK FORMS -->
+    <% if (documents.length === 0) { %>
+        <div class="empty-state">
+            <div class="empty-icon">📂</div>
+            <p>The student has not uploaded any documents yet.</p>
+        </div>
+    <% } else { %>
+        <div class="documents-grid">
+            <% documents.forEach(doc => { %>
+
+                <!-- Document Card -->
+                <div class="document-card">
+                    <div class="doc-icon">📄</div>
+                    <div class="doc-info">
+                        <div class="doc-version"><%= doc.version_label %></div>
+                        <div class="doc-filename"><%= doc.original_filename %></div>
+                        <div class="doc-meta">
+                            <span>
+                                Uploaded:
+                                <%= new Date(doc.uploaded_at).toLocaleDateString() %>
+                            </span>
+                            <% if (doc.feedback && doc.feedback.length > 0) { %>
+                                <span class="feedback-count">
+                                    💬 <%= doc.feedback.length %> feedback(s)
+                                </span>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Existing Feedback -->
+                <% if (doc.feedback && doc.feedback.length > 0) { %>
+                    <div class="feedback-section"
+                         style="margin: -6px 0 8px 0; border-radius:0;">
+                        <div class="feedback-thread">
+                            <% doc.feedback.forEach(fb => { %>
+                                <div class="feedback-item">
+                                    <div class="feedback-avatar">
+                                        <%= fb.faculty_name
+                                            ? fb.faculty_name.charAt(0).toUpperCase()
+                                            : 'F' %>
+                                    </div>
+                                    <div class="feedback-body">
+                                        <div class="feedback-meta-top">
+                                            <span class="feedback-author">
+                                                <%= fb.faculty_name %>
+                                            </span>
+                                            <span class="feedback-dept">
+                                                <%= fb.department %>
+                                            </span>
+                                            <span class="feedback-time">
+                                                <%= new Date(fb.created_at).toLocaleDateString() %>
+                                            </span>
+                                        </div>
+                                        <div class="feedback-comment"><%= fb.comment %></div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% } %>
+
+                <!-- Add Feedback Form -->
+                <div class="add-feedback-card"
+                     style="margin: -6px 0 20px 0; border-radius:0 0 10px 10px;
+                            border-top: 1px solid #eee;">
+                    <h3 style="font-size:14px; margin-bottom:12px;">
+                        ✏️ Add Feedback for "<%= doc.original_filename %>"
+                    </h3>
+                    <form action="/faculty/proposal/<%= proposal.id %>/feedback/<%= doc.id %>"
+                          method="POST">
+                        <div class="form-group">
+                            <label>Select Faculty *</label>
+                            <select name="faculty_id" required>
+                                <option value="">-- Select --</option>
+                                <% facultyList.forEach(f => { %>
+                                    <option value="<%= f.id %>"><%= f.name %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Comment *</label>
+                            <textarea name="comment" rows="3" required
+                                placeholder="Write your feedback on this draft..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-feedback-submit">
+                            💬 Submit Feedback
+                        </button>
+                    </form>
+                </div>
+
+            <% }) %>
+        </div>
+    <% } %>
+
+</div>
+
+<script>
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) window.location.reload();
+    });
+</script>
+</body>
+</html>

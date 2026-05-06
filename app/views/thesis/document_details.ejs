@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Proposal Detail | UniSync</title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+    <div class="container">
+        <a href="javascript:history.back()" class="btn btn-secondary btn-sm back-btn">← Back</a>
+
+        <h1>Thesis Proposal Review</h1>
+
+        <% if (error) { %>
+            <p class="error"><%= error %></p>
+        <% } %>
+
+        <% if (!proposal) { %>
+            <p class="error">Proposal not found.</p>
+        <% } else { %>
+
+        <!-- Proposal Info Card -->
+        <div class="proposal-card">
+            <div class="proposal-header">
+                <h2><%= proposal.title %></h2>
+                <%
+                  let badgeClass = 'status-pending';
+                  if (proposal.status === 'accepted') badgeClass = 'status-accepted';
+                  if (proposal.status === 'rejected') badgeClass = 'status-rejected';
+                %>
+                <span class="status-badge <%= badgeClass %>">
+                    <%= proposal.status.charAt(0).toUpperCase() + proposal.status.slice(1) %>
+                </span>
+            </div>
+
+            <div class="proposal-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Student</span>
+                    <span><%= proposal.student_name || 'N/A' %></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Email</span>
+                    <span><%= proposal.student_email || 'N/A' %></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Faculty</span>
+                    <span><%= proposal.faculty_name || 'N/A' %></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Subject Area</span>
+                    <span><%= proposal.subject_area %></span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Submitted</span>
+                    <span><%= new Date(proposal.submitted_at).toLocaleString() %></span>
+                </div>
+                <% if (proposal.reviewed_at) { %>
+                <div class="meta-item">
+                    <span class="meta-label">Reviewed</span>
+                    <span><%= new Date(proposal.reviewed_at).toLocaleString() %></span>
+                </div>
+                <% } %>
+            </div>
+
+            <div class="proposal-description">
+                <h3>Description</h3>
+                <p><%= proposal.description %></p>
+            </div>
+
+            <% if (proposal.faculty_note) { %>
+            <div class="faculty-note">
+                <h3>Faculty Note</h3>
+                <p><%= proposal.faculty_note %></p>
+            </div>
+            <% } %>
+        </div>
+
+        <!-- ============================================
+             DOCUMENTS SECTION
+             - Faculty sees all docs + feedback
+             - Student sees docs + can upload if accepted
+        ============================================ -->
+        <div class="proposal-card" style="margin-top: 24px;">
+            <div class="proposal-header">
+                <h2>📁 Thesis Documents</h2>
+                <span class="feedback-count-badge"><%= documents.length %> file(s)</span>
+            </div>
+
+            <!-- Document List -->
+            <% if (documents.length === 0) { %>
+                <div class="empty-state">
+                    <div class="empty-icon">📂</div>
+                    <p>No documents uploaded yet.</p>
+                </div>
+            <% } else { %>
+                <div class="documents-grid" style="margin-top: 16px;">
+                    <% documents.forEach(doc => { %>
+
+                        <!-- Document Card -->
+                        <div class="document-card">
+                            <div class="doc-icon">📄</div>
+                            <div class="doc-info">
+                                <div class="doc-version"><%= doc.version_label %></div>
+                                <div class="doc-filename"><%= doc.original_filename %></div>
+                                <div class="doc-meta">
+                                    <span>
+                                        <%= doc.uploaded_at
+                                            ? new Date(doc.uploaded_at).toLocaleDateString()
+                                            : '' %>
+                                    </span>
+                                    <% if (doc.feedback && doc.feedback.length > 0) { %>
+                                        <span class="feedback-count">
+                                            💬 <%= doc.feedback.length %> comment(s)
+                                        </span>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <a href="/documents/<%= doc.id %>" class="btn btn-sm">
+                                View & Feedback
+                            </a>
+                        </div>
+
+                        <!-- Inline Feedback under each doc -->
+                        <% if (doc.feedback && doc.feedback.length > 0) { %>
+                            <div style="margin: -4px 0 16px 56px;">
+                                <% doc.feedback.forEach(fb => { %>
+                                    <div class="feedback-item" style="margin-bottom: 10px;">
+                                        <div class="feedback-avatar">
+                                            <%= fb.faculty_name
+                                                ? fb.faculty_name.charAt(0).toUpperCase()
+                                                : 'F' %>
+                                        </div>
+                                        <div class="feedback-body">
+                                            <div class="feedback-meta-top">
+                                                <span class="feedback-author"><%= fb.faculty_name %></span>
+                                                <span class="feedback-dept"><%= fb.department %></span>
+                                                <span class="feedback-time">
+                                                    <%= fb.created_at
+                                                        ? new Date(fb.created_at).toLocaleDateString()
+                                                        : '' %>
+                                                </span>
+                                            </div>
+                                            <div class="feedback-comment"><%= fb.comment %></div>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } %>
+
+                    <% }) %>
+                </div>
+            <% } %>
+
+            <!-- Upload Section — only if accepted -->
+            <% if (proposal.status === 'accepted') { %>
+                <div style="margin-top: 24px; border-top: 1px solid #eee; padding-top: 20px;">
+                    <h3 style="margin-bottom: 14px; color: #2c3e50;">📤 Upload New Draft</h3>
+
+                    <% if (uploadError) { %>
+                        <p class="error"><%= uploadError %></p>
+                    <% } %>
+                    <% if (uploadSuccess) { %>
+                        <p class="success"><%= uploadSuccess %></p>
+                    <% } %>
+
+                    <form action="/documents/proposal/<%= proposal.id %>/upload"
+                          method="POST"
+                          enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label>Select PDF File *</label>
+                            <input type="file" name="file" accept="application/pdf" required />
+                        </div>
+                        <button type="submit" class="btn btn-upload">Upload Draft</button>
+                    </form>
+                </div>
+
+            <% } else if (proposal.status === 'pending') { %>
+                <div class="already-reviewed" style="margin-top: 16px;">
+                    <p>
+                        📌 Document upload will be available once the faculty
+                        <strong>accepts</strong> your proposal.
+                    </p>
+                </div>
+
+            <% } else if (proposal.status === 'rejected') { %>
+                <div class="already-reviewed" style="margin-top: 16px;">
+                    <p>❌ This proposal was rejected. Document upload is not available.</p>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Faculty Review Form — only if pending -->
+        <% if (proposal.status === 'pending') { %>
+        <div class="review-form-card" style="margin-top: 24px;">
+            <h2>Make a Decision</h2>
+            <form action="/thesis/proposal/<%= proposal.id %>/review" method="POST">
+                <div class="form-group">
+                    <label for="faculty_note">Note to Student (optional)</label>
+                    <textarea id="faculty_note" name="faculty_note" rows="4"
+                        placeholder="Add a comment or reason for your decision..."></textarea>
+                </div>
+                <div class="decision-buttons">
+                    <button type="submit" name="status" value="accepted" class="btn btn-accept">
+                        ✓ Accept Supervision
+                    </button>
+                    <button type="submit" name="status" value="rejected" class="btn btn-reject">
+                        ✗ Reject Request
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <% } else { %>
+            <div class="already-reviewed" style="margin-top: 24px;">
+                <p>
+                    This proposal has already been
+                    <strong><%= proposal.status %></strong>.
+                    No further action needed.
+                </p>
+            </div>
+        <% } %>
+
+        <% } %>
+    </div>
+</body>
+</html>
